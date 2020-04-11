@@ -14,6 +14,7 @@ namespace CsLoxInterpreter
         private int Start = 0;     // OffSet in current string
         private int Current = 0;    // OffSet in current string
         private int Line = 1;
+
         public Scanner(string source)
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -68,6 +69,11 @@ namespace CsLoxInterpreter
                         // A comment goes until the end of a line.
                         while (Peek() != '\n' && !isAtEnd()) Advance();
                     }
+                    else if (Match('*'))
+                    {
+                        Console.WriteLine("Multi Line");
+                        MultiLineComment();
+                    }
                     else
                     {
                         AddToken(TokenType.SLASH);
@@ -96,12 +102,28 @@ namespace CsLoxInterpreter
             }
         }
 
+        private void MultiLineComment()
+        {
+            while ((Peek() != '*' && PeekNext() != '/') && !isAtEnd())
+            {
+                // Move through the body of the multi
+                if (Peek() == '\n') Line++;
+                Advance();
+            }
+            if (isAtEnd())
+                CSLox.Error(this.Line, "Unterminated multi-line comment");
+            else
+            {
+                // Here is the end of the multi line comment
+                Advance(); Advance();
+            }
+        }
         private void Identifier()
         {
             while (IsAlphaNumeric(Peek())) Advance();
             // What did we just scan, and is it a reserved key word?
-            string text = Source.Substring(this.Start, Current-Start);
-            var  token  = KeyWords.TryGetValue(text, out var  matchedToken)? matchedToken: TokenType.IDENTIFIER;
+            string text = Source.Substring(this.Start, Current - Start);
+            var token = KeyWords.TryGetValue(text, out var matchedToken) ? matchedToken : TokenType.IDENTIFIER;
             AddToken(token);
         }
 
@@ -150,7 +172,7 @@ namespace CsLoxInterpreter
             }
             Advance();
             // ignore the surrounding quotes!
-            var value = Source.Substring(Start + 1, (Current - 1)- (Start+1));
+            var value = Source.Substring(Start + 1, (Current - 1) - (Start + 1));
             AddToken(TokenType.STRING, value);
         }
 
@@ -175,7 +197,8 @@ namespace CsLoxInterpreter
             return this.Source[Current - 1];
         }
 
-
+        // Tests the next character
+        // Advances if true.
         private bool Match(char expected)
         {
             if (this.isAtEnd()) return false;
