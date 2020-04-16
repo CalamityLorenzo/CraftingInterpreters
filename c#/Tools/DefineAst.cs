@@ -11,10 +11,10 @@ internal static class DefineAst
         var sb = new StringBuilder();
         var line = "{0};\n";
         sb.AppendFormat(line, "using System");
-        sb.AppendFormat(line, "using System.Collection.Generic");
-        sb.AppendLine("namespace Expressions {");
+        sb.AppendFormat(line, "using System.Collections.Generic");
+        sb.AppendLine("namespace CsLoxInterpreter.Expressions {");
         sb.AppendLine($"internal abstract class {baseName} {{");
-        sb.AppendLine("abstract T Accept<T>(Visitor<T> visitor);");
+        sb.AppendLine("internal abstract T Accept<T>(Visitor<T> visitor);");
         sb.AppendLine(DefineVisitor(baseName, types));
         
         sb.AppendLine(BuildTypes(baseName, types));
@@ -39,9 +39,9 @@ internal static class DefineAst
     private static string DefineType(string baseName, string className, string fieldList)
     {
         StringBuilder newClass = new StringBuilder();
-        newClass.AppendLine($"static class {className} : {baseName} {{");
+        newClass.AppendLine($"internal class {className} : {baseName} {{");
         // Constructor
-        newClass.AppendLine($"\t{className}({fieldList}){{");
+        newClass.AppendLine($"\tinternal {className}({fieldList}){{");
         // Store paramters in fields
         var fields = fieldList.Split(", ");
         foreach (var fld in fields)
@@ -52,8 +52,8 @@ internal static class DefineAst
         newClass.AppendLine("\t}\n");
 
         newClass.AppendLine();
-        newClass.AppendLine("override T Accept<T>(Visitor<T> visitor){");
-        newClass.AppendLine($"\t\treturn visitor.visit{className}{baseName}(this);");
+        newClass.AppendLine("internal override T Accept<T>(Visitor<T> visitor){");
+        newClass.AppendLine($"\t\treturn visitor.Visit{className}{baseName}(this);");
         newClass.AppendLine("}");
 
         // Class Fields

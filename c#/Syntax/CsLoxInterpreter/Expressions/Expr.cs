@@ -1,11 +1,12 @@
 using System;
-using System.Collection.Generic;
-namespace Expressions
+using System.Collections.Generic;
+
+namespace CsLoxInterpreter.Expressions
 {
     internal abstract class Expr
     {
-        abstract T Accept<T>(Visitor<T> visitor);
-        interface Visitor<T>
+        internal abstract T Accept<T>(Visitor<T> visitor);
+        internal interface Visitor<T>
         {
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
@@ -13,9 +14,9 @@ namespace Expressions
             T VisitUnaryExpr(Unary expr);
         }
 
-        static class Binary : Expr
+        internal class Binary : Expr
         {
-            Binary(Expr left, Token @operator, Expr right)
+            internal Binary(Expr left, Token @operator, Expr right)
             {
                 this.left = left;
                 this.@operator = @operator;
@@ -23,57 +24,57 @@ namespace Expressions
             }
 
 
-            override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(Visitor<T> visitor)
             {
-                return visitor.visitBinaryExpr(this);
+                return visitor.VisitBinaryExpr(this);
             }
             public Expr left { get; }
             public Token @operator { get; }
             public Expr right { get; }
         }
 
-        static class Grouping : Expr
+        internal class Grouping : Expr
         {
-            Grouping(Expr expression)
+            internal Grouping(Expr expression)
             {
                 this.expression = expression;
             }
 
 
-            override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(Visitor<T> visitor)
             {
-                return visitor.visitGroupingExpr(this);
+                return visitor.VisitGroupingExpr(this);
             }
             public Expr expression { get; }
         }
 
-        static class Literal : Expr
+        internal class Literal : Expr
         {
-            Literal(Object value)
+            internal Literal(Object value)
             {
                 this.value = value;
             }
 
 
-            override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(Visitor<T> visitor)
             {
-                return visitor.visitLiteralExpr(this);
+                return visitor.VisitLiteralExpr(this);
             }
             public Object value { get; }
         }
 
-        static class Unary : Expr
+        internal class Unary : Expr
         {
-            Unary(Token @operator, Expr right)
+            internal Unary(Token @operator, Expr right)
             {
                 this.@operator = @operator;
                 this.right = right;
             }
 
 
-            override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(Visitor<T> visitor)
             {
-                return visitor.visitUnaryExpr(this);
+                return visitor.VisitUnaryExpr(this);
             }
             public Token @operator { get; }
             public Expr right { get; }

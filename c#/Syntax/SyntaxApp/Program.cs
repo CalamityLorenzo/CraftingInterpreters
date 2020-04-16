@@ -6,7 +6,7 @@ namespace ParserApp
     {
         static void Main(string[] args)
         {
-            CSLox.Main(args);
+            Console.WriteLine(CsLoxInterpreter.Demo.DemoPrinter.GoDemo());
         }
     }
 }

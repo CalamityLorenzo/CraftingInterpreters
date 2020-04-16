@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Parser", "Parser", "{E6CE5A63-D1CB-4B1C-8ACD-2AD9EDDD94ED}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Syntax", "Syntax", "{E6CE5A63-D1CB-4B1C-8ACD-2AD9EDDD94ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsLoxInterpreter", "Parser\CsLoxInterpreter\CsLoxInterpreter.csproj", "{B5D90ABB-1905-47E7-9599-B211D04B6E9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsLoxInterpreter", "Syntax\CsLoxInterpreter\CsLoxInterpreter.csproj", "{B5D90ABB-1905-47E7-9599-B211D04B6E9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserApp", "Parser\ParserApp\ParserApp.csproj", "{7ABA75AA-2A15-459C-A303-2AED077521DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyntaxApp", "Syntax\SyntaxApp\SyntaxApp.csproj", "{7ABA75AA-2A15-459C-A303-2AED077521DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
