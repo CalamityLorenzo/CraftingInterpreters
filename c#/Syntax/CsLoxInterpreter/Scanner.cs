@@ -122,13 +122,15 @@ namespace CsLoxInterpreter
                     Advance();
                     break;
                 }
-                Advance();  
+                // Annoying this cannot be done until the end. We have not checked the current char
+                Advance();
             }
             if (isAtEnd())
                 CSLox.Error(this.Line, "Unterminated multi-line comment");
             else
             {
-                // Here is the end of the multi line comment
+                // Here we are at  the end of the multi line comment
+                // So much the last two chars
                 Advance(); Advance();
             }
         }
