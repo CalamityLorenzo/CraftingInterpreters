@@ -10,17 +10,17 @@ namespace CsLoxInterpreter
         static bool HadError = false;
         public static void Main(string[] args)
         {
-            var thisAssemblt = System.AppDomain.CurrentDomain.FriendlyName;
+            var thisAssembly = System.AppDomain.CurrentDomain.FriendlyName;
 
             if (args.Length > 1)
             {
-                Console.WriteLine($"Useage: {thisAssemblt}");
+                Console.WriteLine($"Useage: {thisAssembly}");
             }
             else if (args.Length == 1)
-                RunFile(args[0]);
+                RunFile(args[0]); // Assume the argument is a file
             else
             {
-                RunPrompt();
+                RunPrompt(); // Run the doo-hickey. REPL
             }
 
         }
@@ -36,7 +36,10 @@ namespace CsLoxInterpreter
             for (; ; )
             {
                 Console.Write("> ");
-                Run(Console.ReadLine());
+                var line = Console.ReadLine();
+                if (line == null || line == "#Quit") break;
+                if(line!=string.Empty)
+                    Run(line);
                 HadError = false;
             }
 
@@ -47,7 +50,7 @@ namespace CsLoxInterpreter
             var scanner = new Scanner(Source);
             List<Token> Tokens = scanner.ScanTokens();
             Tokens.ForEach(token => Console.WriteLine(token));
-            if (HadError) throw new Exception("CS Lox has died badly.");
+            if (HadError) throw new Exception("CS Lox has died, badly.");
         }
 
         internal static void Error(int line, string message)

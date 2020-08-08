@@ -5,7 +5,7 @@ using CsLoxInterpreter.Expressions;
 
 namespace CsLoxInterpreter
 {
-    internal class AstPrinter : Expr.Visitor<string>
+    internal class AstPrinter : Expr.ILoxVisitor<string>
     {
 
         public string Print(Expr expr)

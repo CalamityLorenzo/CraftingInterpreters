@@ -16,7 +16,7 @@ namespace ExpressIonGenerator
             var outputDir = args[0];
             DefineAst.Build(outputDir, "Expr", new List<string>(){
                 "Binary   : Expr left, Token @operator, Expr right",
-               "Grouping : Expr expression",
+                "Grouping : Expr expression",
                 "Literal  : Object value",
                 "Unary    : Token @operator, Expr right"
             })

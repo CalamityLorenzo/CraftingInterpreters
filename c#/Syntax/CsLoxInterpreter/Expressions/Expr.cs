@@ -5,8 +5,9 @@ namespace CsLoxInterpreter.Expressions
 {
     internal abstract class Expr
     {
-        internal abstract T Accept<T>(Visitor<T> visitor);
-        internal interface Visitor<T>
+        internal abstract T Accept<T>(ILoxVisitor<T> visitor);
+
+        internal interface ILoxVisitor<T>
         {
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
@@ -24,7 +25,7 @@ namespace CsLoxInterpreter.Expressions
             }
 
 
-            internal override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
             {
                 return visitor.VisitBinaryExpr(this);
             }
@@ -41,7 +42,7 @@ namespace CsLoxInterpreter.Expressions
             }
 
 
-            internal override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
             {
                 return visitor.VisitGroupingExpr(this);
             }
@@ -56,7 +57,7 @@ namespace CsLoxInterpreter.Expressions
             }
 
 
-            internal override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
             {
                 return visitor.VisitLiteralExpr(this);
             }
@@ -72,14 +73,13 @@ namespace CsLoxInterpreter.Expressions
             }
 
 
-            internal override T Accept<T>(Visitor<T> visitor)
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
             {
                 return visitor.VisitUnaryExpr(this);
             }
             public Token @operator { get; }
             public Expr right { get; }
         }
-
 
     }
 }

@@ -6,7 +6,10 @@ namespace ParserApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(CsLoxInterpreter.Demo.DemoPrinter.GoDemo());
+            if(args.Length>0)
+                Console.WriteLine(args[0]);
+            CsLoxInterpreter.CSLox.Main(args);
+            Console.WriteLine("and breathe..");
         }
     }
 }

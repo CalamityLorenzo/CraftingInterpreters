@@ -3,18 +3,30 @@
 using System;
 using System.Collections.Generic;
 using CsLoxInterpreter.Details;
-
+using static CsLoxInterpreter.TokenType;
 namespace CsLoxInterpreter
 {
-    public class Scanner
+    internal class Scanner
     {
         private Dictionary<string, TokenType> KeyWords = KeyWordStore.ReservedWords;
+        /// <summary>
+        /// Tokens found in Source
+        /// </summary>
         private List<Token> Tokens { get; } = new List<Token>();
+        /// <summary>
+        /// Corpus being examined
+        /// </summary>
         private string Source { get; }
-        private int Start = 0;     // OffSet in current string
-        private int Current = 0;    // OffSet in current string
+        // OffSet in current string
+        private int Start = 0;
+        // OffSet in current string (Re-aligned with Start and beginning of each loop)
+        private int Current = 0;
         private int Line = 1;
 
+        /// <summary>
+        /// The whole body to parsed.
+        /// </summary>
+        /// <param name="source"></param>
         public Scanner(string source)
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -24,17 +36,22 @@ namespace CsLoxInterpreter
             Source = source;
         }
 
+        /// <summary>
+        /// Scanner engine and clent entrypoint 
+        /// </summary>
+        /// <returns></returns>
         public List<Token> ScanTokens()
         {
             try
-            {// Recursive parser
+            {   // Recursive parser
                 while (!isAtEnd())
                 {
                     // Set iterators
                     this.Start = this.Current;
                     ScanToken();
                 }
-                this.Tokens.Add(new Token(TokenType.EOF, "", null, Line));
+                // Add an EOF at the end for completeness
+                this.Tokens.Add(new Token(EOF, "", null, Line));
                 return Tokens;
             }
             catch (Exception)
@@ -49,8 +66,8 @@ namespace CsLoxInterpreter
             char c = Advance();
             switch (c)
             {
-                case '(': AddToken(TokenType.LEFT_PAREN); break;
-                case ')': AddToken(TokenType.RIGHT_PAREN); break;
+                case '(': AddToken(LEFT_PAREN); break;
+                case ')': AddToken(RIGHT_PAREN); break;
                 case '{': AddToken(TokenType.LEFT_BRACE); break;
                 case '}': AddToken(TokenType.RIGHT_BRACE); break;
                 case ',': AddToken(TokenType.COMMA); break;
@@ -59,23 +76,18 @@ namespace CsLoxInterpreter
                 case '+': AddToken(TokenType.PLUS); break;
                 case ';': AddToken(TokenType.SEMICOLON); break;
                 case '*': AddToken(TokenType.STAR); break;
-                case '!': AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG_EQUAL); break;
-                case '=': AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL_EQUAL); break;
-                case '<': AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS); break;
-                case '>': AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER); break;
+                case '!': AddToken(Match('=') ? BANG_EQUAL : BANG); break;
+                case '=': AddToken(Match('=') ? EQUAL_EQUAL : EQUAL); break;
+                case '<': AddToken(Match('=') ? LESS_EQUAL : LESS); break;
+                case '>': AddToken(Match('=') ? GREATER_EQUAL : GREATER); break;
                 case '/':
-                    if (Match('/'))
-                    {
+                    if (Match('/')){
                         // A comment goes until the end of a line.
                         while (Peek() != '\n' && !isAtEnd()) Advance();
-                    }
-                    else if (Match('*'))
-                    {
-                        MultiLineComment();
-                    }
-                    else
-                    {
-                        AddToken(TokenType.SLASH);
+                    } else if (Match('*')){
+                        NaiveMultiLineComment();
+                    }else{
+                        AddToken(SLASH);
                     }
                     break;
                 case ' ':
@@ -83,36 +95,34 @@ namespace CsLoxInterpreter
                 case '\t':
                     break; // ignoring whitespace and carry on.
                 case '\n':
-                    this.Line++; // update the line, and carry on.
+                    this.Line++; // update the line nunber, and carry on.
                     break;
-                case '"': String(); break;
+                case '"': StringSequence(); break;
+                    // Capturing all Numbers is simpler than 1 case per number.
+                case char val when (Char.IsDigit(val)): Number(); break;
+                    // Capturing all a-Z AND _
+                case char val when IsAlpha(val): Identifier(); break;
                 default:
-                    if (Char.IsDigit(c))
-                        Number();
-                    else if (IsAlpha(c))
-                    {
-                        Identifier();
-                    }
-                    else
-                    {
-                        CSLox.Error(this.Line, "Unexpected Character");
-                    }
+                    CSLox.Error(this.Line, "Unexpected Character");
                     break;
             }
         }
 
-        private void MultiLineComment()
+        private void NaiveMultiLineComment()
         {
             // we start inside a multi-line comment.
             // but it could be nested
-            var nested =1;
-            while ((Peek() != '*' && PeekNext() != '/') && !isAtEnd())
+
+            var nested = 1;
+            while (!isAtEnd())
             {
                 // Move through the body of the multi
                 if (Peek() == '\n') Line++;
-                if(Peek() == '/' && PeekNext()=='*' && !isAtEnd())
-                    nested+=1;
-                Advance();
+                if (Peek() == '*' && PeekNext() == '/'){
+                    Advance();
+                    break;
+                }
+                Advance();  
             }
             if (isAtEnd())
                 CSLox.Error(this.Line, "Unterminated multi-line comment");
@@ -122,12 +132,13 @@ namespace CsLoxInterpreter
                 Advance(); Advance();
             }
         }
+
         private void Identifier()
         {
             while (IsAlphaNumeric(Peek())) Advance();
             // What did we just scan, and is it a reserved key word?
             string text = Source.Substring(this.Start, Current - Start);
-            var token = KeyWords.TryGetValue(text, out var matchedToken) ? matchedToken : TokenType.IDENTIFIER;
+            var token = KeyWords.TryGetValue(text, out var matchedToken) ? matchedToken : IDENTIFIER;
             AddToken(token);
         }
 
@@ -150,19 +161,21 @@ namespace CsLoxInterpreter
             // or maybe just the first part
             if (Peek() == '.' && Char.IsDigit(PeekNext()))
             {
-                // We want that .
+                // We want that '.'
                 Advance();
                 while (Char.IsDigit(Peek())) Advance();
 
             }
 
-            AddToken(TokenType.NUMBER, Double.Parse(Source.Substring(Start, Current - Start)));
+            AddToken(NUMBER, Double.Parse(Source.Substring(Start, Current - Start)));
         }
-
-
-
-        private void String()
+        /// <summary>
+        /// A string has been started "
+        /// this collects all the characters until the end.
+        /// </summary>
+        private void StringSequence()
         {
+            // Move until we reach the end of a string;
             while (Peek() != '"' && !isAtEnd())
             {
                 if (Peek() == '\n') Line++;
@@ -174,56 +187,82 @@ namespace CsLoxInterpreter
                 CSLox.Error(Line, "Unterminated string");
                 return;
             }
+            // Move past the final "
             Advance();
-            // ignore the surrounding quotes!
+            // ignore the surrounding quotes, and create the token
             var value = Source.Substring(Start + 1, (Current - 1) - (Start + 1));
-            AddToken(TokenType.STRING, value);
+            AddToken(STRING, value);
         }
 
-        /// returns next but does not advance
+        /// <summary>
+        /// returns next character but does not advance
+        /// A Fundamental
+        /// </summary>
+        /// <returns></returns>
         private char Peek()
-        {
+        {   //OBO Current-1 == Actual current token
             if (isAtEnd()) return '\0';
             return Source[Current];
         }
-        // Returns next +1 does not advance
+        /// <summary>
+        /// Returns next +1 does not advance
+        /// </summary>
+        /// <returns></returns>
         private char PeekNext()
         {
             if (Current + 1 >= Source.Length) return '\0';
             return Source[Current + 1];
         }
 
-        // Returns the NEXT character
-        // And Moves forward.
+        /// <summary>
+        /// Returns the NEXT character
+        /// And Increments the current.
+        /// A Fundamental
+        /// </summary>
+        /// <returns></returns>
         private char Advance()
         {
             Current++;
             return this.Source[Current - 1];
         }
 
-        // Tests the next character
-        // Advances if true.
+        /// <summary>
+        /// Tests for the next character Advances if true.
+        /// Combines Peek/Advance
+        /// </summary>
+        /// <param name="expected"></param>
+        /// <returns></returns>
         private bool Match(char expected)
         {
             if (this.isAtEnd()) return false;
-            // tests current (+1)
+            // tests current (+1) OBO
             if (this.Source[Current] != expected) return false;
             this.Current++;
             return true;
         }
 
+        /// <summary>
+        /// Adds token to the scanning results
+        /// </summary>
+        /// <param name="tokenType"></param>
         private void AddToken(TokenType tokenType)
         {
             AddToken(tokenType, null);
         }
-
+        /// <summary>
+        /// Adds token to the scanning results, also any information
+        /// </summary>
+        /// <param name="tokenType"></param>
         private void AddToken(TokenType tokenType, object literal)
         {
             var text = Source.Substring(this.Start, Current - Start);
             Tokens.Add(new Token(tokenType, text, literal, Line));
         }
 
-
+        /// <summary>
+        /// Test to see if we have reaced the soure end.
+        /// </summary>
+        /// <returns></returns>
         private bool isAtEnd() => this.Current >= this.Source.Length;
     }
 }
