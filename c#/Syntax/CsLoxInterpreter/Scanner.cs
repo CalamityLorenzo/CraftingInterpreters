@@ -108,12 +108,11 @@ namespace CsLoxInterpreter
             }
         }
 
-        private void NaiveMultiLineComment()
+        private void NaiveMultiLineComment(int nested =1)
         {
             // we start inside a multi-line comment.
             // but it could be nested
-
-            var nested = 1;
+            
             while (!isAtEnd())
             {
                 // Move through the body of the multi
@@ -122,7 +121,13 @@ namespace CsLoxInterpreter
                     Advance();
                     break;
                 }
-                // Annoying this cannot be done until the end. We have not checked the current char
+
+                if (Peek() == '/' && PeekNext() == '*'){
+                    Advance();Advance();
+                    NaiveMultiLineComment(nested+1);
+                }
+                // Annoying this cannot be done until the end. 
+                // We have not checked the current char
                 Advance();
             }
             if (isAtEnd())
@@ -130,8 +135,8 @@ namespace CsLoxInterpreter
             else
             {
                 // Here we are at  the end of the multi line comment
-                // So much the last two chars
-                Advance(); Advance();
+                // munch the last char.
+                 Advance();
             }
         }
 

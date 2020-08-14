@@ -24,7 +24,7 @@ namespace CsLoxInterpreter
             }
 
         }
-
+       
         private static void RunFile(string filePath)
         {
             var rawFile = File.ReadAllText(filePath);
@@ -66,6 +66,7 @@ namespace CsLoxInterpreter
             Console.ForegroundColor = currentForeground;
             HadError = true;
         }
+
     }
 
 }

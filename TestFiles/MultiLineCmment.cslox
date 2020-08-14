@@ -1,6 +1,14 @@
 /* this
 * is 
-a multi -
-line
+    /*
+    a multi -
+    line
+    */
 */
+
 var lox = "lox"
+
+/* No one
+ did
+    fridge
+*/
