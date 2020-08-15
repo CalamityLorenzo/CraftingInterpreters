@@ -16,7 +16,7 @@ namespace CsLoxInterpreter.Demo
                 new Expr.Literal(45.67)));
 
             return new AstPrinter().Print(expression);
-        }
+        }   
 
         public static string Chapter05()
         {
