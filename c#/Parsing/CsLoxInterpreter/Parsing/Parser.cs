@@ -1,10 +1,9 @@
-﻿using CsLoxInterpreter.Expressions;
+﻿using CsLoxInterpreter.Exceptions;
+using CsLoxInterpreter.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq.Expressions;
-using System.Text;
 using static CsLoxInterpreter.TokenType;
+
 namespace CsLoxInterpreter.Parsing
 {
     /// <summary>
@@ -21,23 +20,61 @@ namespace CsLoxInterpreter.Parsing
         {
             this.tokens = tokens;
         }
-
+        /// <summary>
+        /// Entry point
+        /// </summary>
+        /// <returns></returns>
         public Expr Parse()
         {
             try
             {
-                return Expression();
+                return Comma();
 
-            } catch(Exception ex)
+            } catch(ParserException ex)
             {
                 return null;
             }
 
         }
+        /// <summary>
+        ///  comma  →  expression ("," expression)*
+
+        /// </summary>
+        /// <returns></returns>
+        private Expr Comma()
+        {
+            Expr expr  = this.Expression();
+
+            while(match(COMMA))
+            {
+                Token @operator = this.Previous();
+                Expr right = this.Expression();
+                expr = new Expr.Binary(expr, @operator, right);
+            }
+            return expr;
+        }
+
+        /// <summary>
+        /// ternary -> equality ("?" expression ":" ternary)?
+        /// </summary>
+        /// <returns></returns>
+        private Expr Ternary()
+        {
+            Expr expr = this.Equality();
+            if(match(QUESTION))
+            {
+                Expr thenC = this.Expression();
+                Consume(COLON, "Expect ':' ad yet none was forth coming");
+                Expr elseBranch = Ternary();
+                expr = new Expr.Ternary(expr, thenC, elseBranch);
+            }
+
+            return expr;
+        }
 
         private Expr Expression()
         {
-            return this.Equality();
+            return this.Ternary();
         }
         /// <summary>
         /// comparison ( ( "!=" | "==" ) comparison )* ;
@@ -57,7 +94,7 @@ namespace CsLoxInterpreter.Parsing
         }
 
         /// <summary>
-        /// addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
+        /// addition → multiplication ( ( "-" | "+" ) multiplication )* ;
         /// </summary>
         /// <returns></returns>
         private Expr Addition()
@@ -70,7 +107,6 @@ namespace CsLoxInterpreter.Parsing
         /// <returns></returns>
         private Expr Multiplication()
         {
-            
             return this.BinaryMethod(Unary, SLASH, STAR);
 
         }
@@ -104,14 +140,20 @@ namespace CsLoxInterpreter.Parsing
 
             if (match(LEFT_PAREN))
             {
-                Expr expr = Expression();
+                Expr expr = Comma();
+                // The next object needs to be a ) after the last expression.
                 Consume(RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
 
             throw ParserError(Peek(), "Expected expression.");
         }
-
+        /// <summary>
+        /// Helper method to extract Binary Expressions.
+        /// </summary>
+        /// <param name="NextMethod"></param>
+        /// <param name="matches"></param>
+        /// <returns></returns>
         private Expr BinaryMethod(Func<Expr> NextMethod, params TokenType[] matches)
         {
             Expr expr = NextMethod();
@@ -123,20 +165,35 @@ namespace CsLoxInterpreter.Parsing
             }
             return expr;
         }
-
+        /// <summary>
+        /// Certain contruscts have explicit strcuture (like ternary x ? a : B) if Explict type is not provided then
+        /// we have stumnled intoa blind alley and should bomb
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private Token Consume(TokenType type, string message)
         {
-
             if (Check(type)) return Advance();
             throw ParserError(Peek(), message);
         }
 
-        private Exception ParserError(Token token, string message)
+        /// <summary>
+        /// Report the error then throw the error.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private ParserException ParserError(Token token, string message)
         {
             CSLox.Error(token, message);
-            throw new Exception();
+            throw new ParserException(token, message);
         }
-
+        /// <summary>
+        /// Error handling.
+        /// If we have a non-fatal error put the parser in state where it can continue.
+        /// This means moving along until the end of statement(;) or a viab ekeyword is encountered
+        /// </summary>
         private void Synchronize()
         {
             this.Advance();
@@ -145,7 +202,7 @@ namespace CsLoxInterpreter.Parsing
                 if (Previous().TokenType == SEMICOLON) return;
                 switch(Peek().TokenType)
                 {
-                    case CLASS:
+                    case CLASS :
                     case FUN:
                     case VAR:
                     case FOR:
@@ -196,7 +253,6 @@ namespace CsLoxInterpreter.Parsing
         {
             return this.tokens[current - 1];
         }
-
 
     }
 }

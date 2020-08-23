@@ -1,6 +1,8 @@
 
+using CsLoxInterpreter.Parsing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using static CsLoxInterpreter.TokenType;
 
@@ -51,7 +53,10 @@ namespace CsLoxInterpreter
             var scanner = new Scanner(Source);
             List<Token> Tokens = scanner.ScanTokens();
             Tokens.ForEach(token => Console.WriteLine(token));
-            if (HadError) throw new Exception("CS Lox has died, badly.");
+            var parser = new Parser(Tokens);
+            var completeExpression = parser.Parse();
+            if (HadError) return;
+            Console.WriteLine(new AstPrinter().Print(completeExpression));
         }
 
         internal static void Error(int line, string message)

@@ -10,6 +10,7 @@ namespace CsLoxInterpreter.Expressions
         internal interface ILoxVisitor<T>
         {
             T VisitBinaryExpr(Binary expr);
+            T VisitTernaryExpr(Ternary expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitUnaryExpr(Unary expr);
@@ -26,12 +27,30 @@ namespace CsLoxInterpreter.Expressions
                 this.right = right;
             }
 
-            internal override T Accept<T>(ILoxVisitor<T> visitor){
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
                 return visitor.VisitBinaryExpr(this);
             }
             public Expr left { get; }
             public Token @operator { get; }
             public Expr right { get; }
+        }
+
+        internal class Ternary : Expr
+        {
+            internal Ternary(Expr expression, Expr ifTrue, Expr ifFalse)
+            {
+                Expression = expression;
+                IfTrue = ifTrue;
+                IfFalse = ifFalse;
+            }
+
+            public Expr Expression { get; }
+            public Expr IfTrue { get; }
+            public Expr IfFalse { get; }
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor) => visitor.VisitTernaryExpr(this);
+
         }
 
         internal class Grouping : Expr
@@ -41,7 +60,8 @@ namespace CsLoxInterpreter.Expressions
                 this.expression = expression;
             }
 
-            internal override T Accept<T>(ILoxVisitor<T> visitor){
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
                 return visitor.VisitGroupingExpr(this);
             }
             public Expr expression { get; }

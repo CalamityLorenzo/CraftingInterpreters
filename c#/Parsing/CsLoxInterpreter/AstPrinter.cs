@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Linq;
 using System.Text;
 using CsLoxInterpreter.Expressions;
@@ -19,7 +20,8 @@ namespace CsLoxInterpreter
         public string VisitLiteralExpr(Expr.Literal expr) => (expr.value == null) ? "null" : expr.value.ToString();
         
         public string VisitUnaryExpr(Expr.Unary expr) => Parenthesize(expr.@operator.Lexeme, expr.right);
-        
+
+        public string VisitTernaryExpr(Expr.Ternary expr) => $"({expr.Expression.Accept(this)} ? {expr.IfTrue.Accept(this)} : {expr.IfFalse.Accept(this)})";
         /// <summary>
         /// This method just wraps the current method in parens for formatting reasons.
         /// </summary>
@@ -29,7 +31,8 @@ namespace CsLoxInterpreter
         private string Parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("(").Append(name);
+            sb.Append("(");
+            sb.Append(name);
             foreach (var expr in exprs)
             {
                 sb.Append(" ");
@@ -39,6 +42,7 @@ namespace CsLoxInterpreter
             sb.Append(")");
             return sb.ToString();
         }
+   
 
     }
 

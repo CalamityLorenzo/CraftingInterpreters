@@ -19,7 +19,10 @@ namespace CsLoxInterpreter
         public string VisitLiteralExpr(Expr.Literal expr) => (expr.value == null) ? "null" : expr.value.ToString();
         
         public string VisitUnaryExpr(Expr.Unary expr) => Format(expr.@operator.Lexeme, expr.right);
-        
+
+        public string VisitTernaryExpr(Expr.Ternary expr) => $"({expr.Expression.Accept(this)} ? {expr.IfTrue.Accept(this)} : {expr.IfFalse.Accept(this)})";
+
+
         /// <summary>
         /// This method just wraps the current method in parens for formatting reasons.
         /// </summary>

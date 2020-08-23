@@ -80,6 +80,8 @@ namespace CsLoxInterpreter
                 case '=': AddToken(Match('=') ? EQUAL_EQUAL : EQUAL); break;
                 case '<': AddToken(Match('=') ? LESS_EQUAL : LESS); break;
                 case '>': AddToken(Match('=') ? GREATER_EQUAL : GREATER); break;
+                case '?': AddToken(QUESTION);break;
+                case ':':AddToken(COLON);break;
                 case '/':
                     if (Match('/')){
                         // A comment goes until the end of a line.
