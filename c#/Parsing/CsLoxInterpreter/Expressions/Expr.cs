@@ -14,9 +14,27 @@ namespace CsLoxInterpreter.Expressions
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitUnaryExpr(Unary expr);
+            T VisitComma(Comma comma);
         }
 
         internal abstract T Accept<T>(ILoxVisitor<T> visitor);
+
+        internal class Comma : Expr
+        {
+            public Comma(Expr left, Expr right)
+            {
+                Left = left;
+                Right = right;
+            }
+
+            public Expr Left { get; }
+            public Expr Right { get; }
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitComma(this);
+            }
+        }
 
         internal class Binary : Expr
         {

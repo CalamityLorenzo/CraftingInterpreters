@@ -30,8 +30,10 @@ namespace CsLoxInterpreter.Parsing
             {
                 return Comma();
 
-            } catch(ParserException ex)
+            }
+            catch (ParserException ex)
             {
+                Console.WriteLine(ex.Message);
                 return null;
             }
 
@@ -43,13 +45,13 @@ namespace CsLoxInterpreter.Parsing
         /// <returns></returns>
         private Expr Comma()
         {
-            Expr expr  = this.Expression();
+            Expr expr = this.Expression();
 
-            while(match(COMMA))
+            while (match(COMMA))
             {
-                Token @operator = this.Previous();
+                // Token @operator = this.Previous();
                 Expr right = this.Expression();
-                expr = new Expr.Binary(expr, @operator, right);
+                expr = new Expr.Comma(expr, right);
             }
             return expr;
         }
@@ -61,10 +63,10 @@ namespace CsLoxInterpreter.Parsing
         private Expr Ternary()
         {
             Expr expr = this.Equality();
-            if(match(QUESTION))
+            if (match(QUESTION))
             {
                 Expr thenC = this.Expression();
-                Consume(COLON, "Expect ':' ad yet none was forth coming");
+                Consume(COLON, "Expect ':' and yet none was forth coming");
                 Expr elseBranch = Ternary();
                 expr = new Expr.Ternary(expr, thenC, elseBranch);
             }
@@ -116,6 +118,7 @@ namespace CsLoxInterpreter.Parsing
         /// <returns></returns>
         private Expr Unary()
         {
+
             if (match(BANG, MINUS))
             {
                 Token @operator = Previous();
@@ -145,6 +148,37 @@ namespace CsLoxInterpreter.Parsing
                 Consume(RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
+            // Error productions
+            // We fell alll the way to the bottom to discocer these schumcks on at the start of an expression
+            // This is an illegal stae. but I don't want to cause a ruckuse.
+            // inform eat the matched/orphand right hand  operand and move on.
+            if (match(BANG_EQUAL, EQUAL_EQUAL))
+            {
+                ParserError(Previous(), "Missing left-hand operand.");
+                Equality();
+                return new Expr.Literal("nil");
+            };
+
+
+            if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
+            {
+                ParserError(Previous(), "Missing left-hand operand.");
+                Comparison();
+                return new Expr.Literal("nil");
+            };
+
+            if (match(PLUS))
+            {
+                ParserError(Previous(), "Missing left-hand operand.");
+                Addition();
+                return new Expr.Literal("nil");
+            };
+            if (match(STAR, SLASH))
+            {
+                ParserError(Previous(), "Missing left-hand operand.");
+                Multiplication();
+                return new Expr.Literal("nil");
+            };
 
             throw ParserError(Peek(), "Expected expression.");
         }
@@ -187,7 +221,7 @@ namespace CsLoxInterpreter.Parsing
         private ParserException ParserError(Token token, string message)
         {
             CSLox.Error(token, message);
-            throw new ParserException(token, message);
+            return new ParserException(token, message);
         }
         /// <summary>
         /// Error handling.
@@ -200,9 +234,9 @@ namespace CsLoxInterpreter.Parsing
             while (!IsAtEnd())
             {
                 if (Previous().TokenType == SEMICOLON) return;
-                switch(Peek().TokenType)
+                switch (Peek().TokenType)
                 {
-                    case CLASS :
+                    case CLASS:
                     case FUN:
                     case VAR:
                     case FOR:

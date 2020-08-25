@@ -22,6 +22,9 @@ namespace CsLoxInterpreter
         public string VisitUnaryExpr(Expr.Unary expr) => Parenthesize(expr.@operator.Lexeme, expr.right);
 
         public string VisitTernaryExpr(Expr.Ternary expr) => $"({expr.Expression.Accept(this)} ? {expr.IfTrue.Accept(this)} : {expr.IfFalse.Accept(this)})";
+
+        public string VisitComma(Expr.Comma comma) => $"({comma.Left?.Accept(this)} , {comma.Right.Accept(this)})";
+
         /// <summary>
         /// This method just wraps the current method in parens for formatting reasons.
         /// </summary>
@@ -38,7 +41,6 @@ namespace CsLoxInterpreter
                 sb.Append(" ");
                 sb.Append(expr.Accept(this));
             }
-
             sb.Append(")");
             return sb.ToString();
         }

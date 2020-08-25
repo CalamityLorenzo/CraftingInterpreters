@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using CsLoxInterpreter.Expressions;
 
@@ -22,6 +23,7 @@ namespace CsLoxInterpreter
 
         public string VisitTernaryExpr(Expr.Ternary expr) => $"({expr.Expression.Accept(this)} ? {expr.IfTrue.Accept(this)} : {expr.IfFalse.Accept(this)})";
 
+        public string VisitComma(Expr.Comma comma) => Format("comma", comma.Left, comma.Right);
 
         /// <summary>
         /// This method just wraps the current method in parens for formatting reasons.
@@ -40,9 +42,9 @@ namespace CsLoxInterpreter
             }
             sb.Append($"{name} ");
 
-            
             return sb.ToString();
         }
+
 
     }
 

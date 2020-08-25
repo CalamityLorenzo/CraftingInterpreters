@@ -55,7 +55,7 @@ namespace CsLoxInterpreter
             Tokens.ForEach(token => Console.WriteLine(token));
             var parser = new Parser(Tokens);
             var completeExpression = parser.Parse();
-            if (HadError) return;
+            //if (HadError) return;
             Console.WriteLine(new AstPrinter().Print(completeExpression));
         }
 

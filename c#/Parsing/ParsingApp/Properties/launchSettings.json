@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ParsingApp": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\TestFiles\\singleExpression.cslox"
+    }
+  }
+}

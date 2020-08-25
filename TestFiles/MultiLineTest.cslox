@@ -1,9 +1,11 @@
-var t = 100
-var _Legs= "2 Undred"
+// var t = 100
+// var _Legs= "2 Undred"
 // Single line comment
-var t = 1+1
+// var t = 1+1
 /* Multi-
     Line -
 comment
 */
-"Ice Hockey Ridge"
+// "Ice Hockey Ridge"
+1+2=3?14="pickesl":5+1-6
+
