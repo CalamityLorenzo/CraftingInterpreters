@@ -1,10 +1,6 @@
-﻿
+﻿using Syntax.CsLoxInterpreter.Details;
 
-using System;
-using System.Collections.Generic;
-using CsLoxInterpreter.Details;
-
-namespace CsLoxInterpreter
+namespace Syntax.CsLoxInterpreter
 {
     public class Scanner
     {
@@ -60,6 +56,8 @@ namespace CsLoxInterpreter
                 case '+': AddToken(TokenType.PLUS); break;
                 case ';': AddToken(TokenType.SEMICOLON); break;
                 case '*': AddToken(TokenType.STAR); break;
+                case '?': AddToken(TokenType.QUESTION); break;
+                case ':': AddToken(TokenType.SEMICOLON); break;
                 case '!': AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG); break;
                 case '=': AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL); break;
                 case '<': AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS); break;

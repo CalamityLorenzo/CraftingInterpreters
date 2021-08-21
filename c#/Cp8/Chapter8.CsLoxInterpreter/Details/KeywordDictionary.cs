@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 
-namespace CsLoxInterpreter.Details
+namespace Syntax.CsLoxInterpreter.Details
 {
     internal static class KeyWordStore
     {

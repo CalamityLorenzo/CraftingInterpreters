@@ -7,20 +7,27 @@ namespace ExpressIonGenerator
     {
         static void Main(string[] args)
         {
-            if (args.Length != 1)
-            {
-                Console.WriteLine("Useage: generate_ast <output_directory>");
-                return;
-            }
+            //if ()
+            //{
+            //    Console.WriteLine("Useage: generate_ast <output_directory>");
+            //    return;
+            //}
 
-            var outputDir = args[0];
+            var outputDir = args.Length != 1 ?  System.Environment.CurrentDirectory : args[0];
             DefineAst.Build(outputDir, "Expr", new List<string>(){
                 "Binary   : Expr left, Token @operator, Expr right",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
-                "Unary    : Token @operator, Expr right"
-            })
-            ;
+                "Unary    : Token @operator, Expr right",
+                "Variable : Token name"
+            });
+
+            DefineAst.Build(outputDir, "Stmt", new List<string>()
+            {
+                "Expression : Expr expression",
+                "Print : Expr expression",
+                "Var : Token name, Expr initializer"
+            });
 
         }
     }

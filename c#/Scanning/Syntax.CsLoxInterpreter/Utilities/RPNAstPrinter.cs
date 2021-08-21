@@ -1,0 +1,45 @@
+﻿using Syntax.CsLoxInterpreter.Expressions;
+using System.Text;
+
+namespace Syntax.CsLoxInterpreter.Utilities
+{
+    public class RpnAstPrinter  : Expressions.Expr.ILoxVisitor<string>
+    {
+        private RpnAstPrinter () { }
+        public static string PrintExpression(Expr expr) => new RpnAstPrinter ().Print(expr);
+
+        public string Print(Expr expr)
+        {
+            return expr.Accept(this);
+        }
+        public string VisitBinaryExpr(Expr.Binary expr)
+        {
+            return Printer(expr.@operator.Lexeme, expr.left, expr.right);
+        }
+
+        public string VisitGroupingExpr(Expr.Grouping expr)
+        {
+            return Printer("group", expr.expression);
+        }
+
+        public string VisitLiteralExpr(Expr.Literal expr) => expr.value == null ? "nil" : expr.value.ToString();
+
+        public string VisitTernary(Expr.Ternary expr) => Printer("conditional", expr.cond, expr.@true, expr.@false);
+        
+
+        public string VisitUnaryExpr(Expr.Unary expr) => Printer(expr.@operator.Lexeme, expr.right);
+        
+
+        private string Printer(string name, params Expr[] exprs)
+        {
+            var sb = new StringBuilder();
+            foreach (var expr in exprs)
+            {
+                sb.Append(expr.Accept(this));
+                sb.Append(" ");
+            }
+            sb.Append($"{name}");
+            return sb.ToString();
+        }
+    }
+}

@@ -1,8 +1,18 @@
+1+1 ? "This is a vall: (2+2)?"Nonmore": 444
+1+1 + "helloe"
+"William"
+
+var lox = "Fred"
+
+1+1 ? "This is a vall": (2+2)?"Nonmore": 444
+
 /* this
-* is 
-    /*
+ is 
+    
     a multi -
     line
+    /*
+        Nested Comment
     */
 */
 
@@ -12,3 +22,5 @@ var lox = "lox"
  did
     fridge
 */
+
+"Why did you leave the keys upon the table" for

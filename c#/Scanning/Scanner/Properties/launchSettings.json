@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Scanner": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\TestFiles\\MultiLineCmment.cslox",
+      "nativeDebugging": true
+        
+    }
+  }
+}

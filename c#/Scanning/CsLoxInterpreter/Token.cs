@@ -8,9 +8,7 @@ namespace CsLoxInterpreter
         public int Line { get; private set; }
         internal Token(TokenType type, string lexeme, object literal, int line)
         {
-            if (lexeme==null) throw new System.ArgumentException("Cannot be", nameof(lexeme));
-            
-
+            if (lexeme==null) throw new System.ArgumentException("Cannot be null", nameof(lexeme));
             (TokenType, Lexeme, Literal, Line) = (type, lexeme, literal, line);
         }
         public override string ToString() => $"{this.TokenType}  {Lexeme} {Literal}";

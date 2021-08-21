@@ -129,7 +129,7 @@ namespace CsLoxInterpreter.Parsing
         }
 
         /// <summary>
-        /// primary → NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")" ;
+        /// primary → NUMBER | STRING | "false" | "true" | "nil" | !=| == |< | <=| > | >= | + | * | / "(" expression ")" ;
         /// </summary>
         /// <returns></returns>
         private Expr Primary()
@@ -144,12 +144,12 @@ namespace CsLoxInterpreter.Parsing
             if (match(LEFT_PAREN))
             {
                 Expr expr = Comma();
-                // The next object needs to be a ) after the last expression.
+                // We have just processed an expression, the next value MUST be a Right Parens to close the expression,
                 Consume(RIGHT_PAREN, "Expect ')' after expression.");
                 return new Expr.Grouping(expr);
             }
             // Error productions
-            // We fell alll the way to the bottom to discocer these schumcks on at the start of an expression
+            // We fell alll the way to the bottom to discover these schumcks on at the start of an expression
             // This is an illegal stae. but I don't want to cause a ruckuse.
             // inform eat the matched/orphand right hand  operand and move on.
             if (match(BANG_EQUAL, EQUAL_EQUAL))
@@ -158,7 +158,6 @@ namespace CsLoxInterpreter.Parsing
                 Equality();
                 return new Expr.Literal("nil");
             };
-
 
             if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
             {

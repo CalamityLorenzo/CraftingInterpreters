@@ -31,7 +31,7 @@ namespace CsLoxInterpreter
         {
             if (string.IsNullOrWhiteSpace(source))
             {
-                throw new ArgumentException("message", nameof(source));
+                throw new ArgumentException("Source cannot be empty", nameof(source));
             }
             Source = source;
         }
@@ -114,7 +114,7 @@ namespace CsLoxInterpreter
         {
             // we start inside a multi-line comment.
             // but it could be nested
-            
+           
             while (!isAtEnd())
             {
                 // Move through the body of the multi
@@ -244,8 +244,9 @@ namespace CsLoxInterpreter
         private bool Match(char expected)
         {
             if (this.isAtEnd()) return false;
-            // tests current (+1) OBO
+            
             if (this.Source[Current] != expected) return false;
+            // If we match move forward one.
             this.Current++;
             return true;
         }
