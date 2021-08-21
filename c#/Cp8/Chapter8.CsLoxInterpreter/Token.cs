@@ -1,4 +1,6 @@
-namespace Syntax.CsLoxInterpreter
+using CsLoxInterpreter;
+
+namespace CsLoxInterpreter
 {
     public class Token
     {

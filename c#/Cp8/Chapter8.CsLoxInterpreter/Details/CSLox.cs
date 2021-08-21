@@ -1,9 +1,9 @@
 
 using Chapter7.CsLoxInterpreter;
-using Syntax.CsLoxInterpreter.Errors;
-using Syntax.CsLoxInterpreter.Utilities;
+using CsLoxInterpreter.Errors;
+using CsLoxInterpreter.Utilities;
 
-namespace Syntax.CsLoxInterpreter.Details
+namespace CsLoxInterpreter.Details
 {
     public static class CSLox
     {
@@ -41,7 +41,8 @@ namespace Syntax.CsLoxInterpreter.Details
             for (; ; )
             {
                 Console.Write("> ");
-                Run(Console.ReadLine());
+                var res = Console.ReadLine();
+                if(res is not null) Run(res);
                 hadError = false;
             }
 

@@ -1,7 +1,7 @@
 ﻿using CsLoxInterpreter.Expressions;
 using System.Text;
 
-namespace Syntax.CsLoxInterpreter.Utilities
+namespace CsLoxInterpreter.Utilities
 {
     public class AstPrinter : Expr.ILoxVisitor<string>
     {

@@ -1,8 +1,8 @@
 ﻿using CsLoxInterpreter.Expressions;
-using Syntax.CsLoxInterpreter.Details;
-using Syntax.CsLoxInterpreter.Errors;
-using static Syntax.CsLoxInterpreter.TokenType;
-namespace Syntax.CsLoxInterpreter
+using CsLoxInterpreter.Details;
+using CsLoxInterpreter.Errors;
+using static CsLoxInterpreter.TokenType;
+namespace CsLoxInterpreter
 {
     class Parser
     {

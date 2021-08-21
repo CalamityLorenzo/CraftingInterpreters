@@ -1,4 +1,4 @@
-using Syntax.CsLoxInterpreter;
+using CsLoxInterpreter;
 
 namespace CsLoxInterpreter.Expressions
 {

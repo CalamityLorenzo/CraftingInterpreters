@@ -1,6 +1,6 @@
-﻿using Syntax.CsLoxInterpreter.Details;
+﻿using CsLoxInterpreter.Details;
 
-namespace Syntax.CsLoxInterpreter
+namespace CsLoxInterpreter
 {
     public class Scanner
     {

@@ -1,4 +1,4 @@
-namespace Syntax.CsLoxInterpreter
+namespace CsLoxInterpreter
 {
     public enum TokenType
     {

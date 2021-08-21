@@ -1,6 +1,6 @@
 ﻿using CsLoxInterpreter.Expressions;
-using Syntax.CsLoxInterpreter;
-using Syntax.CsLoxInterpreter.Utilities;
+using CsLoxInterpreter;
+using CsLoxInterpreter.Utilities;
 namespace app
 {
     class Program
@@ -8,7 +8,7 @@ namespace app
 
         static void Main(string[] args)
         {
-            Syntax.CsLoxInterpreter.Details.CSLox.Main(args);
+            CsLoxInterpreter.Details.CSLox.Main(args);
         }
 
         static void Old(string[] args)

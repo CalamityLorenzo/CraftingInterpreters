@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Syntax.CsLoxInterpreter.Errors
+namespace CsLoxInterpreter.Errors
 {
     class ParserError : Exception
     {

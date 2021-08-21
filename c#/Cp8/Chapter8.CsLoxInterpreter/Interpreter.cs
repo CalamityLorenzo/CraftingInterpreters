@@ -1,8 +1,8 @@
 ﻿using CsLoxInterpreter.Expressions;
-using Syntax.CsLoxInterpreter;
-using Syntax.CsLoxInterpreter.Details;
-using Syntax.CsLoxInterpreter.Errors;
-using static Syntax.CsLoxInterpreter.TokenType;
+using CsLoxInterpreter;
+using CsLoxInterpreter.Details;
+using CsLoxInterpreter.Errors;
+using static CsLoxInterpreter.TokenType;
 namespace Chapter7.CsLoxInterpreter
 {
     class Interpreter : Stmt.Visitor<System.ValueTuple>,
@@ -174,6 +174,11 @@ namespace Chapter7.CsLoxInterpreter
 
                 return obj?.ToString();
             }
+        }
+
+        public ValueTuple VisitVarStmt(Stmt.Var stmt)
+        {
+            throw new NotImplementedException();
         }
     }
 
