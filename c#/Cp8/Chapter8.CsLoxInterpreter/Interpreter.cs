@@ -3,7 +3,7 @@ using CsLoxInterpreter;
 using CsLoxInterpreter.Details;
 using CsLoxInterpreter.Errors;
 using static CsLoxInterpreter.TokenType;
-namespace Chapter7.CsLoxInterpreter
+namespace CsLoxInterpreter
 {
     class Interpreter : Stmt.Visitor<System.ValueTuple>,
                         Expr.ILoxVisitor<object>

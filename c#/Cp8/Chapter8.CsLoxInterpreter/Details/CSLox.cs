@@ -1,5 +1,5 @@
 
-using Chapter7.CsLoxInterpreter;
+using CsLoxInterpreter;
 using CsLoxInterpreter.Errors;
 using CsLoxInterpreter.Utilities;
 
