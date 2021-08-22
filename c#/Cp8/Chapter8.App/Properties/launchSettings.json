@@ -1,11 +1,17 @@
 {
   "profiles": {
-    "Scanner": {
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {},
+      "distributionName": ""
+    },
+    "Assignment": {
       "commandName": "Project",
       "nativeDebugging": true
     },
-    "Profile 1": {
-      "commandName": "Executable"
+    "Asignment_file": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\AssignData.cslox"
     }
   }
 }

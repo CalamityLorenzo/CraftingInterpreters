@@ -1,14 +1,17 @@
-﻿using CsLoxInterpreter.Expressions;
-using CsLoxInterpreter;
-using CsLoxInterpreter.Details;
+﻿using CsLoxInterpreter.Details;
 using CsLoxInterpreter.Errors;
+using CsLoxInterpreter.Expressions;
 using static CsLoxInterpreter.TokenType;
+using Unit = System.ValueTuple;
+
 namespace CsLoxInterpreter
 {
     class Interpreter : Stmt.Visitor<System.ValueTuple>,
                         Expr.ILoxVisitor<object>
     {
-#region Expr.ILoxVisitor
+
+        private CSLoxEnvironment _Environment = new CSLoxEnvironment();
+        #region Expr.ILoxVisitor
         public object VisitBinaryExpr(Expr.Binary expr)
         {
             Object left = Evaluate(expr.left);
@@ -31,7 +34,6 @@ namespace CsLoxInterpreter
                     if (left.GetType() == typeof(double) && right.GetType() == typeof(double))
                         return (double)left + (double)right;
                     throw new RuntimeError(expr.@operator, "Operands should be string or numbers");
-                    break;
                 case GREATER:
                     CheckNumberOperands(expr.@operator, left, right);
                     return BasicBinary(left, right, (l, r) => l > r);
@@ -82,7 +84,7 @@ namespace CsLoxInterpreter
             return Evaluate(expr.expression);
         }
 
-      
+
         public object VisitLiteralExpr(Expr.Literal expr)
         {
             return expr.value;
@@ -103,7 +105,7 @@ namespace CsLoxInterpreter
             }
 
             return null;
-        } 
+        }
 
         private bool isTruthy(object right)
         {
@@ -112,12 +114,12 @@ namespace CsLoxInterpreter
             return true;
         }
 
-     
+
 
         #endregion
 
         #region Stmt.Visitor
-        public ValueTuple VisitExpressionStmt(Stmt.Expression stmt)
+        public ValueTuple VisitExpressionStmt(Stmt.ExpressionStmt stmt)
         {
             Evaluate(stmt.expression);
             return new ValueTuple();
@@ -129,17 +131,31 @@ namespace CsLoxInterpreter
             Console.WriteLine(Stringify(obj));
             return new ValueTuple();
         }
+        public ValueTuple VisitVarStmt(Stmt.Var stmt)
+        {
+            object value = null;
+            if (stmt.initializer != null)
+                value = Evaluate(stmt.initializer);
+
+            _Environment.Define(stmt.name.Lexeme, value);
+            return new ValueTuple();
+        }
+
+        public object VisitVariableExpr(Expr.Variable expr)
+        {
+            return _Environment.Get(expr.name);
+        }
         #endregion
 
         public void Interpret(List<Stmt> statements)
         {
             try
             {
-                foreach(Stmt stmt in statements)
+                foreach (Stmt stmt in statements)
                 {
                     Execute(stmt);
                 }
-                
+
             }
             catch (RuntimeError ex)
             {
@@ -176,9 +192,12 @@ namespace CsLoxInterpreter
             }
         }
 
-        public ValueTuple VisitVarStmt(Stmt.Var stmt)
+        public object VisitAssignExpr(Expr.Assign expr)
         {
-            throw new NotImplementedException();
+            object value = Evaluate(expr.value);
+            _Environment.Assign(expr.name, value);
+            return value;
+
         }
     }
 

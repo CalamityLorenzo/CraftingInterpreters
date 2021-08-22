@@ -15,6 +15,7 @@ namespace ExpressIonGenerator
 
             var outputDir = args.Length != 1 ?  System.Environment.CurrentDirectory : args[0];
             DefineAst.Build(outputDir, "Expr", new List<string>(){
+                "Assign : Token name, Expr value",
                 "Binary   : Expr left, Token @operator, Expr right",
                 "Grouping : Expr expression",
                 "Literal  : Object value",
@@ -24,6 +25,7 @@ namespace ExpressIonGenerator
 
             DefineAst.Build(outputDir, "Stmt", new List<string>()
             {
+                "Block : List<Stmt> statments",
                 "Expression : Expr expression",
                 "Print : Expr expression",
                 "Var : Token name, Expr initializer"

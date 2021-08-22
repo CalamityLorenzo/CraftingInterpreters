@@ -12,6 +12,12 @@ namespace CsLoxInterpreter.Utilities
         {
             return expr.Accept(this);
         }
+
+        public string VisitAssignExpr(Expr.Assign expr)
+        {
+            return Printer(expr.name.Lexeme, expr.value);
+        }
+
         public string VisitBinaryExpr(Expr.Binary expr)
         {
             return Printer(expr.@operator.Lexeme, expr.left, expr.right);
@@ -26,7 +32,11 @@ namespace CsLoxInterpreter.Utilities
        
 
         public string VisitUnaryExpr(Expr.Unary expr) => Printer(expr.@operator.Lexeme, expr.right);
-        
+
+        public string VisitVariableExpr(Expr.Variable expr)
+        {
+            return Printer(expr.name.Lexeme, expr);
+        }
 
         private string Printer(string name, params Expr[] exprs)
         {

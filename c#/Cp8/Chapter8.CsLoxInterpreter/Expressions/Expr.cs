@@ -10,10 +10,32 @@ namespace CsLoxInterpreter.Expressions
 
         internal interface ILoxVisitor<T>
         {
+            T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitUnaryExpr(Unary expr);
+            T VisitVariableExpr(Variable expr);
+
+        }
+
+        public class Assign : Expr
+        {
+            // l-side is the identifer
+            // r side is an expression, that will be assigned to our object on evaluation.
+            // it's not evalulated until it's required.
+            internal Assign(Token name, Expr value)
+            {
+                this.name = name;
+                this.value = value;
+            }
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitAssignExpr(this);
+            }
+            public Token name { get; }
+            public Expr value { get; }
         }
 
         public class Binary : Expr
@@ -60,7 +82,7 @@ namespace CsLoxInterpreter.Expressions
             {
                 return visitor.VisitLiteralExpr(this);
             }
-            public Object value { get; }
+            public Object? value { get; }
         }
 
         public class Unary : Expr
@@ -77,6 +99,20 @@ namespace CsLoxInterpreter.Expressions
             }
             public Token @operator { get; }
             public Expr right { get; }
+        }
+        public class Variable : Expr
+        {
+            internal Variable(Token name)
+            {
+                this.name = name;
+            }
+
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitVariableExpr(this);
+            }
+            public Token name { get; }
         }
     }
 }

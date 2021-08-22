@@ -8,14 +8,28 @@ namespace CsLoxInterpreter.Expressions
         internal abstract T Accept<T>(Visitor<T> visitor);
         internal interface Visitor<T>
         {
-            T VisitExpressionStmt(Expression stmt);
+            T VisitBlockStmt(Block stmt);
+            T VisitExpressionStmt(ExpressionStmt stmt);
             T VisitPrintStmt(Print stmt);
             T VisitVarStmt(Var stmt);
         }
 
-        internal class Expression : Stmt
+        internal class Block : Stmt
         {
-            internal Expression(Expr expression)
+            internal Block(List<Stmt> statments)
+            {
+                this.statments = statments;
+            }
+
+            internal override T Accept<T>(Visitor<T> visitor)
+            {
+                return visitor.VisitBlockStmt(this);
+            }
+            public List<Stmt> statments { get; }
+        }
+        internal class ExpressionStmt : Stmt
+        {
+            internal ExpressionStmt(Expr expression)
             {
                 this.expression = expression;
             }

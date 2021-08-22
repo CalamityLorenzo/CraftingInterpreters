@@ -19,23 +19,62 @@ namespace CsLoxInterpreter
             var statements = new List<Stmt>();
             while(!IsAtEnd())
             {
-                statements.Add(Statement());
+                statements.Add(Declaration());
             }
             return statements;
+        }
+
+        private Stmt Declaration()
+        {
+            try
+            {
+                if (Match(VAR)) return VarDeclaration();
+                return Statement();
+            }catch(ParserError error)
+            {
+                Synchronize();
+                return null;
+            }
+        }
+
+        private Stmt VarDeclaration()
+        {
+            Token name = Consume(IDENTIFIER, "Expect variable name");
+
+            Expr initializer = null;
+            if (Match(EQUAL))
+            {
+                initializer = Expression();
+            }
+
+            Consume(SEMICOLON, "Expect ';' after variable declaration");
+            return new Stmt.Var(name, initializer); 
         }
 
         private Stmt Statement()
         {
             if (Match(PRINT)) return PrintStatement();
-
+            if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
             return ExpressionStatement();
+        }
+
+        private List<Stmt> Block()
+        {
+            List<Stmt> statements = new List<Stmt>();
+            while(!Check(RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(RIGHT_BRACE, "Expected '}' after block.");
+            return statements;
         }
 
         private Stmt ExpressionStatement()
         {
             Expr expr = Expression();
             Consume(SEMICOLON, "Expect ';' after expression.");
-            return new Stmt.Expression(expr);
+            return new Stmt.ExpressionStmt(expr);
         }
 
         private Stmt PrintStatement()
@@ -45,7 +84,27 @@ namespace CsLoxInterpreter
             return new Stmt.Print(expr);
         }
 
-        private Expr Expression() { return Equality(); }
+        private Expr Expression() { return Assignment(); }
+
+        private Expr Assignment()
+        {
+            Expr expr = Equality();
+            if (Match(EQUAL))
+            {
+                Token equals = Previous();
+                Expr value = Assignment();
+
+                if(expr.GetType() == typeof(Expr.Variable))
+                {
+                    Token name = ((Expr.Variable)expr).name;
+                    return new Expr.Assign(name, value);
+                }
+
+                Error(equals, "Invalid assignment target");
+            }
+
+            return expr;
+        }
 
         private Expr Equality()
         {
@@ -113,6 +172,8 @@ namespace CsLoxInterpreter
             if (Match(FALSE)) return new Expr.Literal(false);
             if (Match(TRUE)) return new Expr.Literal(true);
             if (Match(NIL)) return new Expr.Literal(value: null);
+
+            if (Match(IDENTIFIER)) return new Expr.Variable(Previous());
 
             if (Match(NUMBER, STRING)) return new Expr.Literal(Previous().Literal);
 

@@ -12,6 +12,12 @@ namespace CsLoxInterpreter.Utilities
         {
             return expr.Accept(this);
         }
+
+        public string VisitAssignExpr(Expr.Assign expr)
+        {
+            return Parenthesize(expr.name.Lexeme, expr.value);
+        }
+
         public string VisitBinaryExpr(Expr.Binary expr)
         {
             return Parenthesize(expr.@operator.Lexeme, expr.left, expr.right);
@@ -24,9 +30,12 @@ namespace CsLoxInterpreter.Utilities
 
         public string VisitLiteralExpr(Expr.Literal expr) => expr.value == null ? "nil" : expr.value.ToString();
 
-
         public string VisitUnaryExpr(Expr.Unary expr) => Parenthesize(expr.@operator.Lexeme, expr.right);
 
+        public string VisitVariableExpr(Expr.Variable expr)
+        {
+            return Parenthesize(expr.name.Lexeme, expr);
+        }
 
         private string Parenthesize(string name, params Expr[] exprs)
         {

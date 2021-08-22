@@ -8,6 +8,12 @@
     <ProjectReference Include="..\Chapter8.CsLoxInterpreter\Chapter8.CsLoxInterpreter.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="loxScript\AssignData.cslox">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyName>Chapter7.App</AssemblyName>
     <OutputType>Exe</OutputType>

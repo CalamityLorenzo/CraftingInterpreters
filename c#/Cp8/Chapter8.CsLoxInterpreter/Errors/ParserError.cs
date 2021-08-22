@@ -20,7 +20,7 @@ namespace CsLoxInterpreter.Errors
 
     class RuntimeError : Exception
     {
-        public Token Token;
+        public Token? Token;
 
 
         public RuntimeError()
