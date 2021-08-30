@@ -6,10 +6,10 @@ using Unit = System.ValueTuple;
 
 namespace CsLoxInterpreter
 {
-    class Interpreter : Stmt.Visitor<System.ValueTuple>,
+    class Interpreter : Stmt.IVisitor<System.ValueTuple>,
                         Expr.ILoxVisitor<object>
     {
-        static object Uninitialized = new object();
+
         private CSLoxEnvironment _Environment = new();
         #region Expr.ILoxVisitor
         public object VisitBinaryExpr(Expr.Binary expr)
@@ -42,7 +42,7 @@ namespace CsLoxInterpreter
                     return BasicBinary(left, right, (l, r) => l >= r);
                 case LESS:
                     CheckNumberOperands(expr.Operator, left, right);
-                    return BasicBinary(left, right, (l, r) => l > r);
+                    return BasicBinary(left, right, (l, r) => l < r);
                 case LESS_EQUAL:
                     CheckNumberOperands(expr.Operator, left, right);
                     return BasicBinary(left, right, (l, r) => l >= r);
@@ -121,8 +121,7 @@ namespace CsLoxInterpreter
         #region Stmt.Visitor
         public ValueTuple VisitExpressionStmt(Stmt.ExpressionStmt stmt)
         {
-            var obj = Evaluate(stmt.Expression);
-            Console.WriteLine(this.Stringify(obj));
+            Evaluate(stmt.Expression);
             return new ValueTuple();
         }
 
@@ -134,8 +133,7 @@ namespace CsLoxInterpreter
         }
         public ValueTuple VisitVarStmt(Stmt.Var stmt)
         {
-            // This makes the default value that silly unit.
-            object value = Interpreter.Uninitialized;
+            object value = null;
             if (stmt.Initializer != null)
                 value = Evaluate(stmt.Initializer);
 
@@ -145,10 +143,7 @@ namespace CsLoxInterpreter
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            var value = _Environment.Get(expr.Name);
-            if (value == Interpreter.Uninitialized) 
-                   throw new RuntimeError(expr.Name, "Variable must be assigned to before use");
-            return value;
+            return _Environment.Get(expr.Name);
         }
         #endregion
 
@@ -226,6 +221,45 @@ namespace CsLoxInterpreter
         public Unit VisitBlockStmt(Stmt.Block stmt)
         {
             ExecuteBlock(stmt.Statments, new CSLoxEnvironment(_Environment));
+            return new Unit();
+        }
+
+        public Unit VisitIfStmt(Stmt.If stmt)
+        {
+            if (isTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+            return new Unit();
+        }
+
+        public object VisitLogicalExpr(Expr.Logical expr)
+        {
+            object left = Evaluate(expr.Left);
+
+            if (expr.@operator.Type == TokenType.OR)
+            {
+                if (isTruthy(left)) return left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return left;
+            }
+            return Evaluate(expr.Right);
+        }
+
+        public Unit VisitWhileStmt(Stmt.While stmt)
+        {
+            while (isTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.Body);
+            }
+
+            
+
             return new Unit();
         }
     }

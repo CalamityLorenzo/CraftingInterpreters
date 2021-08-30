@@ -7,6 +7,8 @@ namespace CsLoxInterpreter
     class Parser
     {
         public List<Token> Tokens { get; set; }
+        public int LoopCounter { get; private set; }
+
         public int Current = 0;
 
         public Parser(List<Token> tokens)
@@ -17,7 +19,7 @@ namespace CsLoxInterpreter
         public List<Stmt> Parse()
         {
             var statements = new List<Stmt>();
-            while(!IsAtEnd())
+            while (!IsAtEnd())
             {
                 statements.Add(Declaration());
             }
@@ -30,7 +32,8 @@ namespace CsLoxInterpreter
             {
                 if (Match(VAR)) return VarDeclaration();
                 return Statement();
-            }catch(ParserError error)
+            }
+            catch (ParserError error)
             {
                 Synchronize();
                 return null;
@@ -48,20 +51,124 @@ namespace CsLoxInterpreter
             }
 
             Consume(SEMICOLON, "Expect ';' after variable declaration");
-            return new Stmt.Var(name, initializer); 
+            return new Stmt.Var(name, initializer);
         }
 
         private Stmt Statement()
         {
+            if (Match(FOR)) return ForStatment();
+            if (Match(IF)) return ifStatement();
             if (Match(PRINT)) return PrintStatement();
+            if (Match(WHILE)) return WhileStatement();
+            if (Match(BREAK)) return BreakStatement();
             if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
             return ExpressionStatement();
         }
 
+        private Stmt BreakStatement()
+        {
+            if (this.LoopCounter == 0)
+            {
+                Error(Previous(), "Must be inside a loop to call breakl");
+            }
+            Consume(SEMICOLON, "Expectinng ';' after a break.");
+            return new Stmt.Break();
+
+        }
+
+        private Stmt ForStatment()
+        {
+            try
+            {
+                this.LoopCounter += 1;
+
+                Consume(LEFT_PAREN, "Exepect '(' after 'for.");
+                Stmt initialiser;
+                if (Match(SEMICOLON))
+                {
+                    initialiser = null;
+                }
+                else if (Match(VAR))
+                {
+                    initialiser = VarDeclaration();
+                }
+                else
+                {
+                    initialiser = ExpressionStatement();
+                }
+
+                Expr Condition = null;
+                if (!Check(SEMICOLON))
+                {
+                    Condition = Expression();
+                }
+                Consume(SEMICOLON, "Expect ';' after loop condition.");
+
+                Expr increment = null;
+                if (!Check(RIGHT_PAREN))
+                {
+                    increment = Expression();
+                }
+                Consume(RIGHT_PAREN, "Expect ')' after for clausess.");
+
+                Stmt body = Statement();
+                if (increment != null)
+                {
+                    body = new Stmt.Block(new List<Stmt> { body, new Stmt.ExpressionStmt(increment) });
+                }
+
+                if (Condition == null) Condition = new Expr.Literal(true);
+                body = new Stmt.While(Condition, body);
+
+                if (initialiser != null)
+                    body = new Stmt.Block(new List<Stmt> { initialiser, body });
+
+
+
+                return body;
+            }
+            finally
+            {
+                LoopCounter--;
+            }
+        }
+
+        private Stmt ifStatement()
+        {
+            Consume(LEFT_PAREN, "Expect '(' after 'if'.");
+            Expr condition = Expression();
+            Consume(RIGHT_PAREN, "Expect  ')' after if condition.");
+
+            Stmt thenBranch = Statement();
+            Stmt elseBranch = null;
+            if (Match(ELSE))
+                elseBranch = Statement();
+
+            return new Stmt.If(condition, thenBranch, elseBranch);
+        }
+
+        private Stmt WhileStatement()
+        {
+            try
+            {
+                this.LoopCounter += 1;
+                Consume(LEFT_PAREN, "Expect '(' after 'while'.");
+                Expr condition = Expression();
+                Consume(RIGHT_PAREN, "Expect ')' after condition.");
+                Stmt body = Statement();
+                return new Stmt.While(condition, body);
+            }
+            finally
+            {
+                this.LoopCounter -= 1;
+            }
+        }
+
+
         private List<Stmt> Block()
         {
-            List<Stmt> statements = new ();
-            while(!Check(RIGHT_BRACE) && !IsAtEnd())
+            List<Stmt> statements = new();
+            while (!Check(RIGHT_BRACE) && !IsAtEnd())
             {
                 statements.Add(Declaration());
             }
@@ -88,13 +195,13 @@ namespace CsLoxInterpreter
 
         private Expr Assignment()
         {
-            Expr expr = Equality();
+            Expr expr = Conditional();
             if (Match(EQUAL))
             {
                 Token equals = Previous();
                 Expr value = Assignment();
 
-                if(expr.GetType() == typeof(Expr.Variable))
+                if (expr.GetType() == typeof(Expr.Variable))
                 {
                     Token name = ((Expr.Variable)expr).Name;
                     return new Expr.Assign(name, value);
@@ -106,6 +213,45 @@ namespace CsLoxInterpreter
             return expr;
         }
 
+        private Expr Conditional()
+        {
+            Expr expr = Or();
+            if (Match(QUESTION))
+            {
+                Expr ifThen = Expression();
+                Consume(COLON, "Expected ':' in conditional expression.");
+                Expr ifElse = Conditional();
+                expr = new Expr.Conditional(expr, ifThen, ifElse);
+            }
+            return expr;
+        }
+
+        private Expr Or()
+        {
+            Expr expr = And();
+            while (Match(OR))
+            {
+                Token @operator = Previous();
+                Expr right = And();
+                expr = new Expr.Logical(expr, @operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expr And()
+        {
+
+            Expr expr = Equality();
+            while (Match(AND))
+            {
+                Token @operator = Previous();
+                Expr right = And();
+                expr = new Expr.Logical(expr, @operator, right);
+            }
+
+            return expr;
+        }
 
         private Expr Equality()
         {

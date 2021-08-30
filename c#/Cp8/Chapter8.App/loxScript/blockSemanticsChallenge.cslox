@@ -1,0 +1,7 @@
+﻿var a = "global a";
+{
+	var a = a+2;
+	print a;
+}
+
+print a;

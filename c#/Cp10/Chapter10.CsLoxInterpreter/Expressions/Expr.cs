@@ -14,6 +14,7 @@ namespace CsLoxInterpreter.Expressions
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
+            T VisitLogicalExpr(Logical expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
 
@@ -36,6 +37,25 @@ namespace CsLoxInterpreter.Expressions
             }
             public Token Name { get; }
             public Expr Value { get; }
+        }
+
+        public class Logical : Expr
+        {
+            internal Logical(Expr left, Token @operator, Expr right)
+            {
+                this.Left = left;
+                this.@operator = @operator;
+                this.Right = right;
+            }
+
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitLogicalExpr(this);
+            }
+            public Expr Left { get; }
+            public Token @operator { get; }
+            public Expr Right { get; }
         }
 
         public class Binary : Expr

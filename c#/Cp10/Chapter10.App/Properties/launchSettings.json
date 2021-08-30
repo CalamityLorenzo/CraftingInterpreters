@@ -11,15 +11,19 @@
     },
     "Asignment_file": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\AssignData.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\AssignData.cslox",
     },
     "Assignment_scope": {
       "commandName": "Project",
       "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\blockSemantics.cslox"
     },
-    "Assignment_Challenge": {
+    "Conditions_While": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\blockSemanticsChallenge.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\whilLoop.cslox"
+    },
+    "Conditions_For": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\forLoop.cslox"
     }
   }
 }

@@ -29,7 +29,11 @@ namespace CsLoxInterpreter.Utilities
         }
 
         public string VisitLiteralExpr(Expr.Literal expr) => expr.Value is null ? "nil" : expr.Value.ToString();
-       
+
+        public string VisitLogicalExpr(Expr.Logical expr)
+        {
+            throw new NotImplementedException();
+        }
 
         public string VisitUnaryExpr(Expr.Unary expr) => Printer(expr.Operator.Lexeme, expr.Right);
 

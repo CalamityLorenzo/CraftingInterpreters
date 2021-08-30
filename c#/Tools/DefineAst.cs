@@ -14,9 +14,9 @@ internal static class DefineAst
         sb.AppendFormat(line, "using System.Collections.Generic");
         sb.AppendLine("namespace CsLoxInterpreter.Expressions {");
         sb.AppendLine($"internal abstract class {baseName} {{");
-        sb.AppendLine("internal abstract T Accept<T>(Visitor<T> visitor);");
+        sb.AppendLine("internal abstract T Accept<T>(IVisitor<T> visitor);");
         sb.AppendLine(DefineVisitor(baseName, types));
-        
+
         sb.AppendLine(BuildTypes(baseName, types));
         sb.AppendLine();
         sb.AppendLine("}");
@@ -27,7 +27,7 @@ internal static class DefineAst
     private static string DefineVisitor(string baseName, List<string> types)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("interface Visitor<T>{");
+        sb.AppendLine("interface IVisitor<T>{");
         foreach (var itm in types)
         {
             var typeName = itm.Split(":")[0].Trim();
@@ -44,22 +44,29 @@ internal static class DefineAst
         newClass.AppendLine($"\tinternal {className}({fieldList}){{");
         // Store paramters in fields
         var fields = fieldList.Split(", ");
-        foreach (var fld in fields)
+        if (fields.Length > 0 && fields[0] != "")
         {
-            var name = fld.Split(" ")[1];
-            newClass.AppendLine($"\tthis.{name}={name};");
+            foreach (var fld in fields)
+            {
+                var name = fld.Split(" ")[1];
+                newClass.AppendLine($"\tthis.{Char.ToUpper(name[0])}{name.Substring(1)}={name};");
+            }
         }
         newClass.AppendLine("\t}\n");
 
         newClass.AppendLine();
-        newClass.AppendLine("internal override T Accept<T>(Visitor<T> visitor){");
+        newClass.AppendLine("internal override T Accept<T>(IVisitor<T> visitor){");
         newClass.AppendLine($"\t\treturn visitor.Visit{className}{baseName}(this);");
         newClass.AppendLine("}");
 
         // Class Fields
-        foreach (var fld in fields)
+        if (fields.Length > 0 && fields[0] != "")
         {
-            newClass.AppendLine($"\tpublic {fld}{{get;}}");
+            foreach (var fld in fields)
+            {
+                var typeName = fld.Split(" ");
+                newClass.AppendLine($"\tpublic {typeName[0]} {Char.ToUpper(typeName[1][0])}{typeName[1].Substring(1)}{{get;}}");
+            }
         }
         newClass.AppendLine("}");
         return newClass.ToString();

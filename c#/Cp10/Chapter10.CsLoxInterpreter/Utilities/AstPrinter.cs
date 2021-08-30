@@ -30,6 +30,11 @@ namespace CsLoxInterpreter.Utilities
 
         public string VisitLiteralExpr(Expr.Literal expr) => expr.Value == null ? "nil" : expr.Value.ToString();
 
+        string Expr.ILoxVisitor<string>.VisitLogicalExpr(Expr.Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitUnaryExpr(Expr.Unary expr) => Parenthesize(expr.Operator.Lexeme, expr.Right);
 
         public string VisitVariableExpr(Expr.Variable expr)

@@ -12,11 +12,12 @@ namespace CsLoxInterpreter.Expressions
         {
             T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
+            T VisitConditional(Conditional expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
+            T VisitLogicalExpr(Logical expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
-
         }
 
         public class Assign : Expr
@@ -36,6 +37,42 @@ namespace CsLoxInterpreter.Expressions
             }
             public Token Name { get; }
             public Expr Value { get; }
+        }
+        public class Conditional : Expr
+        {
+            internal Conditional(Expr condition, Expr ifThen, Expr ifElse)
+            {
+                Condition = condition;
+                this.IfThen = ifThen;
+                this.IfElse = ifElse;
+            }
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitConditional(this);
+            }
+
+            public Expr Condition { get; }
+            public Expr IfThen { get; }
+            public Expr IfElse { get; }
+        }
+
+        public class Logical : Expr
+        {
+            internal Logical(Expr left, Token @operator, Expr right)
+            {
+                this.Left = left;
+                this.@operator = @operator;
+                this.Right = right;
+            }
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitLogicalExpr(this);
+            }
+            public Expr Left { get; }
+            public Token @operator { get; }
+            public Expr Right { get; }
         }
 
         public class Binary : Expr

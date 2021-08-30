@@ -17,9 +17,17 @@
       "commandName": "Project",
       "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\blockSemantics.cslox"
     },
-    "Assignment_Challenge": {
+    "Conditions_While": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\blockSemanticsChallenge.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\whilLoop.cslox"
+    },
+    "Conditions_For": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\forLoop.cslox"
+    },
+    "Conditions_Conditioanl": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\Conditional.cslox"
     }
   }
 }

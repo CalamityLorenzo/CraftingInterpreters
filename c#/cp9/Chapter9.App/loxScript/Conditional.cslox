@@ -1,0 +1,8 @@
+﻿
+var x=100;
+
+var d = x>100 ? "Greater than 100" : "Not greater than 100";
+var c = x<101? "Less than 101" : "Not less than 101";
+
+print d;
+print c;

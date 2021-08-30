@@ -6,10 +6,10 @@ using Unit = System.ValueTuple;
 
 namespace CsLoxInterpreter
 {
-    class Interpreter : Stmt.Visitor<System.ValueTuple>,
+    class Interpreter : Stmt.IVisitor<System.ValueTuple>,
                         Expr.ILoxVisitor<object>
     {
-        static object Uninitialized = new object();
+
         private CSLoxEnvironment _Environment = new();
         #region Expr.ILoxVisitor
         public object VisitBinaryExpr(Expr.Binary expr)
@@ -42,7 +42,7 @@ namespace CsLoxInterpreter
                     return BasicBinary(left, right, (l, r) => l >= r);
                 case LESS:
                     CheckNumberOperands(expr.Operator, left, right);
-                    return BasicBinary(left, right, (l, r) => l > r);
+                    return BasicBinary(left, right, (l, r) => l < r);
                 case LESS_EQUAL:
                     CheckNumberOperands(expr.Operator, left, right);
                     return BasicBinary(left, right, (l, r) => l >= r);
@@ -107,35 +107,56 @@ namespace CsLoxInterpreter
             return null;
         }
 
-        private bool isTruthy(object right)
+        public object VisitLogicalExpr(Expr.Logical expr)
         {
-            if (right == null) return false;
-            if (right.GetType() == typeof(bool)) return (bool)right;
-            return true;
+            object left = Evaluate(expr.Left);
+
+            if (expr.@operator.Type == TokenType.OR)
+            {
+                if (isTruthy(left)) return left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return left;
+            }
+            return Evaluate(expr.Right);
         }
 
+        public object VisitConditional(Expr.Conditional expr)
+        {
+            if (isTruthy(Evaluate(expr.Condition)))
+                return Evaluate(expr.IfThen);
+
+            return Evaluate(expr.IfElse);
+        }
+
+        public object VisitAssignExpr(Expr.Assign expr)
+        {
+            object value = Evaluate(expr.Value);
+            _Environment.Assign(expr.Name, value);
+            return value;
+
+        }
 
 
         #endregion
 
         #region Stmt.Visitor
-        public ValueTuple VisitExpressionStmt(Stmt.ExpressionStmt stmt)
+        public Unit VisitExpressionStmt(Stmt.ExpressionStmt stmt)
         {
-            var obj = Evaluate(stmt.Expression);
-            Console.WriteLine(this.Stringify(obj));
-            return new ValueTuple();
+            Evaluate(stmt.Expression);
+            return new Unit();
         }
 
-        public ValueTuple VisitPrintStmt(Stmt.Print stmt)
+        public Unit VisitPrintStmt(Stmt.Print stmt)
         {
             var obj = Evaluate(stmt.Expression);
             Console.WriteLine(Stringify(obj));
             return new ValueTuple();
         }
-        public ValueTuple VisitVarStmt(Stmt.Var stmt)
+        public Unit VisitVarStmt(Stmt.Var stmt)
         {
-            // This makes the default value that silly unit.
-            object value = Interpreter.Uninitialized;
+            object value = null;
             if (stmt.Initializer != null)
                 value = Evaluate(stmt.Initializer);
 
@@ -145,11 +166,52 @@ namespace CsLoxInterpreter
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            var value = _Environment.Get(expr.Name);
-            if (value == Interpreter.Uninitialized) 
-                   throw new RuntimeError(expr.Name, "Variable must be assigned to before use");
-            return value;
+            return _Environment.Get(expr.Name);
         }
+
+        public Unit VisitWhileStmt(Stmt.While stmt)
+        {
+            try
+            {
+                while (isTruthy(Evaluate(stmt.Condition)))
+                {
+                    Execute(stmt.Body);
+                }
+            }
+            catch (BreakException ex)
+            {
+                // Do nothing.
+            }
+
+            return new Unit();
+        }
+
+        public Unit VisitBreakStmt(Stmt.Break stmt)
+        {
+            // Weird...use the parent language expcetion handler.....
+            throw new BreakException();
+        }
+
+        public Unit VisitBlockStmt(Stmt.Block stmt)
+        {
+            ExecuteBlock(stmt.Statments, new CSLoxEnvironment(_Environment));
+            return new Unit();
+        }
+
+        public Unit VisitIfStmt(Stmt.If stmt)
+        {
+            if (isTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+            return new Unit();
+        }
+
+
         #endregion
 
         public void Interpret(List<Stmt> statements)
@@ -215,19 +277,15 @@ namespace CsLoxInterpreter
             }
         }
 
-        public object VisitAssignExpr(Expr.Assign expr)
-        {
-            object value = Evaluate(expr.Value);
-            _Environment.Assign(expr.Name, value);
-            return value;
 
+        private bool isTruthy(object right)
+        {
+            if (right == null) return false;
+            if (right.GetType() == typeof(bool)) return (bool)right;
+            return true;
         }
 
-        public Unit VisitBlockStmt(Stmt.Block stmt)
-        {
-            ExecuteBlock(stmt.Statments, new CSLoxEnvironment(_Environment));
-            return new Unit();
-        }
+
     }
 
 

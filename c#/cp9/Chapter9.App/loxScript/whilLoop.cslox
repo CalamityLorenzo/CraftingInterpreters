@@ -1,0 +1,13 @@
+﻿
+var x=100;
+
+while(x>1){
+	print "hello";
+	var y=x-1;
+	x=y;
+	if(x==90) break;
+	print x;
+}
+
+break;
+

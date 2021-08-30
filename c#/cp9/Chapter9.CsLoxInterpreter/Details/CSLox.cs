@@ -1,8 +1,5 @@
-
-using CsLoxInterpreter;
 using CsLoxInterpreter.Errors;
 using CsLoxInterpreter.Expressions;
-using CsLoxInterpreter.Utilities;
 
 namespace CsLoxInterpreter.Details
 {
@@ -55,7 +52,7 @@ namespace CsLoxInterpreter.Details
             {
                 var scanner = new Scanner(Source);
                 List<Token> Tokens = scanner.ScanTokens();
-               // Tokens.ForEach(token => Console.WriteLine(token));
+                Tokens.ForEach(token => Console.WriteLine(token));
                 // Tokens into meaningful expressions.
                 Parser parser = new(Tokens);
                 List<Stmt> stmts = parser.Parse();
@@ -71,10 +68,8 @@ namespace CsLoxInterpreter.Details
                     Console.WriteLine("Csharp - Runtime smash..");
                     Environment.Exit(70);
                 }
-                //foreach (var statement in stmts)
-                //{
-                //    Console.WriteLine(AstPrinter.PrintExpression(statement.));
-                //}
+                
+             // Console.WriteLine(AstPrinter.PrintExpression(stmts));
             }
         }
 
