@@ -1,4 +1,6 @@
-﻿using CsLoxInterpreter.Details;
+﻿using CsLoxInterpreter.Calling;
+using CsLoxInterpreter.Calling.NativeFunctions;
+using CsLoxInterpreter.Details;
 using CsLoxInterpreter.Errors;
 using CsLoxInterpreter.Expressions;
 using static CsLoxInterpreter.TokenType;
@@ -9,8 +11,18 @@ namespace CsLoxInterpreter
     class Interpreter : Stmt.IVisitor<System.ValueTuple>,
                         Expr.ILoxVisitor<object>
     {
+        private CSLoxEnvironment _Globals = new();
 
-        private CSLoxEnvironment _Environment = new();
+        private CSLoxEnvironment _Environment;
+
+        public CSLoxEnvironment Globals => _Globals;
+
+        public Interpreter()
+        {
+            _Globals.Define("clock", new ClockLoxCallable());
+
+            _Environment = _Globals;
+        }
         #region Expr.ILoxVisitor
         public object VisitBinaryExpr(Expr.Binary expr)
         {
@@ -45,7 +57,7 @@ namespace CsLoxInterpreter
                     return BasicBinary(left, right, (l, r) => l < r);
                 case LESS_EQUAL:
                     CheckNumberOperands(expr.Operator, left, right);
-                    return BasicBinary(left, right, (l, r) => l >= r);
+                    return BasicBinary(left, right, (l, r) => l <= r);
                 case BANG_EQUAL: return !IsEqual(left, right);
                 case EQUAL_EQUAL: return IsEqual(left, right);
 
@@ -107,31 +119,46 @@ namespace CsLoxInterpreter
             return null;
         }
 
-        private bool isTruthy(object right)
+        public object VisitLogicalExpr(Expr.Logical expr)
         {
-            if (right == null) return false;
-            if (right.GetType() == typeof(bool)) return (bool)right;
-            return true;
+            object left = Evaluate(expr.Left);
+
+            if (expr.@operator.Type == TokenType.OR)
+            {
+                if (isTruthy(left)) return left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return left;
+            }
+            return Evaluate(expr.Right);
         }
 
+        public object VisitAssignExpr(Expr.Assign expr)
+        {
+            object value = Evaluate(expr.Value);
+            _Environment.Assign(expr.Name, value);
+            return value;
+
+        }
 
 
         #endregion
 
         #region Stmt.Visitor
-        public ValueTuple VisitExpressionStmt(Stmt.ExpressionStmt stmt)
+        public Unit VisitExpressionStmt(Stmt.ExpressionStmt stmt)
         {
             Evaluate(stmt.Expression);
-            return new ValueTuple();
+            return new Unit();
         }
 
-        public ValueTuple VisitPrintStmt(Stmt.Print stmt)
+        public Unit VisitPrintStmt(Stmt.Print stmt)
         {
             var obj = Evaluate(stmt.Expression);
             Console.WriteLine(Stringify(obj));
             return new ValueTuple();
         }
-        public ValueTuple VisitVarStmt(Stmt.Var stmt)
+        public Unit VisitVarStmt(Stmt.Var stmt)
         {
             object value = null;
             if (stmt.Initializer != null)
@@ -145,6 +172,84 @@ namespace CsLoxInterpreter
         {
             return _Environment.Get(expr.Name);
         }
+
+        public Unit VisitWhileStmt(Stmt.While stmt)
+        {
+            try
+            {
+                while (isTruthy(Evaluate(stmt.Condition)))
+                {
+                    Execute(stmt.Body);
+                }
+            }
+            catch (BreakException ex)
+            {
+                // Do nothing.
+            }
+
+            return new Unit();
+        }
+
+        public Unit VisitBreakStmt(Stmt.Break stmt)
+        {
+            // Weird...use the parent language expcetion handler.....
+            throw new BreakException();
+        }
+
+        public Unit VisitBlockStmt(Stmt.Block stmt)
+        {
+            ExecuteBlock(stmt.Statments, new CSLoxEnvironment(_Environment));
+            return new Unit();
+        }
+
+        public Unit VisitIfStmt(Stmt.If stmt)
+        {
+            if (isTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+            return new Unit();
+        }
+        public object VisitCallExpr(Expr.Call expr)
+        {
+            object callee = Evaluate(expr.Callee);
+            List<object> arguments = new();
+            foreach (Expr argument in expr.Arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            if (!(callee is ILoxCallable))
+                throw new RuntimeError(expr.Paren, "Can only call functions and classes.");
+
+            ILoxCallable function = (ILoxCallable)callee;
+            if (arguments.Count != function.Arity())
+            {
+                throw new RuntimeError(expr.Paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+            }
+
+            return function.Call(this, arguments);
+        }
+
+        public Unit VisitFunctionStmt(Stmt.Function stmt)
+        {
+            LoxFunction function = new(stmt, this._Environment);
+            this._Environment.Define(stmt.Name.Lexeme, function);
+            return new Unit();
+        }
+
+        public Unit VisitReturnStmt(Stmt.Return stmt)
+        {
+            object value = null;
+            if (stmt.Value != null) 
+                value = Evaluate(stmt.Value);
+            throw new ReturnValue(value);
+        }
+
         #endregion
 
         public void Interpret(List<Stmt> statements)
@@ -172,7 +277,7 @@ namespace CsLoxInterpreter
             stmt.Accept(this);
         }
 
-        private void ExecuteBlock(List<Stmt> statements, CSLoxEnvironment environment)
+        internal void ExecuteBlock(List<Stmt> statements, CSLoxEnvironment environment)
         {
             var previous = this._Environment;
 
@@ -210,59 +315,15 @@ namespace CsLoxInterpreter
             }
         }
 
-        public object VisitAssignExpr(Expr.Assign expr)
-        {
-            object value = Evaluate(expr.Value);
-            _Environment.Assign(expr.Name, value);
-            return value;
 
+        private bool isTruthy(object right)
+        {
+            if (right == null) return false;
+            if (right.GetType() == typeof(bool)) return (bool)right;
+            return true;
         }
 
-        public Unit VisitBlockStmt(Stmt.Block stmt)
-        {
-            ExecuteBlock(stmt.Statments, new CSLoxEnvironment(_Environment));
-            return new Unit();
-        }
 
-        public Unit VisitIfStmt(Stmt.If stmt)
-        {
-            if (isTruthy(Evaluate(stmt.Condition)))
-            {
-                Execute(stmt.ThenBranch);
-            }else if (stmt.ElseBranch != null)
-            {
-                Execute(stmt.ElseBranch);
-            }
-            return new Unit();
-        }
-
-        public object VisitLogicalExpr(Expr.Logical expr)
-        {
-            object left = Evaluate(expr.Left);
-
-            if (expr.@operator.Type == TokenType.OR)
-            {
-                if (isTruthy(left)) return left;
-            }
-            else
-            {
-                if (!isTruthy(left)) return left;
-            }
-            return Evaluate(expr.Right);
-        }
-
-        public Unit VisitWhileStmt(Stmt.While stmt)
-        {
-            while (isTruthy(Evaluate(stmt.Condition)))
-            {
-                Execute(stmt.Body);
-            }
-
-            
-
-            return new Unit();
-        }
     }
-
 
 }

@@ -1,14 +1,20 @@
 program         -> declaration* EOF;
-declaration     -> varDecl | statement;
+declaration     -> funcDecl | varDecl | statement;
+funcDecl        -> "fun" function;
+function        -> IDENTIFIER "(" parameters? ")" block;
+parameters      -> IDENTIFIER ( "," IDENTIFIER )*;
 varDecl         -> "var" IDENTIFIER ("=" expression)? ";" ;
 statement       -> exprStmt 
                 | forStmt
                 | ifStmt
                 | printStmt
+                | returnStmt
                 | whileStmt
                 | block;                
 exprStmt        -> expression ";" ;
-forStmt         -> "for" "(" (varDecl| exprStmt | ";") expression? ";" expression? ")" statement;       
+forStmt         -> "for" "(" (varDecl| exprStmt | ";") 
+                   expression? ";" 
+                   expression? ")" statement;       
 ifStmt          -> "if" "(" expression ")" statement
                    ( "else" statement)? ;
 whileStmt       -> "while" "(" expression ")" statement ;
@@ -23,7 +29,9 @@ equality        -> comparison (("!=" | "==") comparison )*;
 comparison      -> term (("<" | ">" | "<=" | ">=") term)*; 
 term            -> factor (("+" | "-") factor)*;
 factor          -> unary (("*" | "\") unary)*;
-unary           -> ("-" | "!" ) unary | primary;
+unary           -> ("-" | "!" ) unary | call;
+call            -> primary ( "(" arguments? ")" )*;   // * allows series of calls MyFunc(1)(2)() etc.
+arguments       -> expression ("," expression )*;       // Arguments is handled as if was an object {arg:one, arg2:two}
 primary         -> NUMBER 
                 | STRING 
                 | "true" 

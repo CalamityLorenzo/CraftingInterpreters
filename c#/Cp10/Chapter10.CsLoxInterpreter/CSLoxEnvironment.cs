@@ -1,5 +1,7 @@
 ﻿using CsLoxInterpreter;
 using CsLoxInterpreter.Errors;
+using System.Collections.Generic;
+using System;
 
 namespace CsLoxInterpreter
 {

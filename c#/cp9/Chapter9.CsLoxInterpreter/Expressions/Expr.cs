@@ -38,6 +38,8 @@ namespace CsLoxInterpreter.Expressions
             public Token Name { get; }
             public Expr Value { get; }
         }
+
+
         public class Conditional : Expr
         {
             internal Conditional(Expr condition, Expr ifThen, Expr ifElse)

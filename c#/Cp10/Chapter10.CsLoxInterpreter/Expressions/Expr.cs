@@ -1,4 +1,5 @@
 using CsLoxInterpreter;
+using System.Collections.Generic;
 
 namespace CsLoxInterpreter.Expressions
 {
@@ -12,6 +13,7 @@ namespace CsLoxInterpreter.Expressions
         {
             T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
+            T VisitCallExpr(Call expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
@@ -76,6 +78,25 @@ namespace CsLoxInterpreter.Expressions
             public Expr Right { get; }
         }
 
+        public class Call : Expr
+        {
+            internal Call(Expr callee, Token paren, List<Expr> arguments)
+            {
+                this.Callee = callee;
+                this.Paren = paren;
+                this.Arguments = arguments;
+            }
+
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitCallExpr(this);
+            }
+            public Expr Callee { get; }
+            public Token Paren { get; }
+            public List<Expr> Arguments { get; }
+        }
+
         public class Grouping : Expr
         {
             public Grouping(Expr expression)
@@ -102,7 +123,7 @@ namespace CsLoxInterpreter.Expressions
             {
                 return visitor.VisitLiteralExpr(this);
             }
-            public Object? Value { get; }
+            public object? Value { get; }
         }
 
         public class Unary : Expr

@@ -2,6 +2,8 @@
 using CsLoxInterpreter.Details;
 using CsLoxInterpreter.Errors;
 using static CsLoxInterpreter.TokenType;
+using System.Collections.Generic;
+
 namespace CsLoxInterpreter
 {
     class Parser
@@ -28,6 +30,7 @@ namespace CsLoxInterpreter
         {
             try
             {
+                if (Match(FUN)) return Function("function");
                 if (Match(VAR)) return VarDeclaration();
                 return Statement();
             }
@@ -36,6 +39,31 @@ namespace CsLoxInterpreter
                 Synchronize();
                 return null;
             }
+        }
+
+        private Stmt Function(string kind)
+        {
+            Token name = Consume(IDENTIFIER, $"Exect {kind} name.");
+            Consume(LEFT_PAREN, $"Expect '(' after {kind} name.");
+            List<Token> parameters = new List<Token>();
+
+            if (!Check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        Error(Peek(), "Can't have more than 255 parameters.");
+                    }
+                    parameters.Add(Consume(IDENTIFIER, "Expect parameter name."));
+                } while (Match(COMMA));
+            }
+
+            Consume(RIGHT_PAREN, "Expected ')' after parameters");
+
+            Consume(LEFT_BRACE, $"Expect '{{' before {kind} body");
+            List<Stmt> body = Block();
+            return new Stmt.Function(name, parameters, body);
         }
 
         private Stmt VarDeclaration()
@@ -57,9 +85,22 @@ namespace CsLoxInterpreter
             if (Match(FOR)) return ForStatment();
             if (Match(IF)) return ifStatement();
             if (Match(PRINT)) return PrintStatement();
+            if (Match(RETURN)) return ReturnStatement();
             if (Match(WHILE)) return WhileStatement();
             if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
             return ExpressionStatement();
+        }
+
+        private Stmt ReturnStatement()
+        {
+            Token keyword = Previous();
+            Expr value = null;
+            if (!Check(SEMICOLON))
+                value = Expression();
+
+            Consume(SEMICOLON, "Expect ';' after return value");
+
+            return new Stmt.Return(keyword, value);
         }
 
         private Stmt ForStatment()
@@ -266,7 +307,38 @@ namespace CsLoxInterpreter
                 var right = Unary();
                 return new Expr.Unary(@operator, right);
             }
-            return Primary();
+            return Call();
+        }
+
+        private Expr Call()
+        {
+            Expr expr = Primary();
+
+            while (true)
+            {
+                if (Match(LEFT_PAREN))
+                {
+                    expr = FinishCall(expr);
+                }
+                else { break; }
+            }
+            return expr;
+        }
+
+        private Expr FinishCall(Expr callee)
+        {
+            List<Expr> arguments = new();
+            if (!Check(RIGHT_PAREN))
+            {
+                do
+                {
+                    arguments.Add(Expression());
+                } while (Match(COMMA));
+            }
+
+            Token paren = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+            return new Expr.Call(callee, paren, arguments);
         }
 
         private Expr Primary()

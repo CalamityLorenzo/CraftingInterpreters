@@ -1,4 +1,5 @@
 ﻿using CsLoxInterpreter.Expressions;
+using System;
 using System.Text;
 
 namespace CsLoxInterpreter.Utilities
@@ -54,6 +55,16 @@ namespace CsLoxInterpreter.Utilities
             }
             sb.Append(")");
             return sb.ToString();
+        }
+
+        private string VisitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        string Expr.ILoxVisitor<string>.VisitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
         }
     }
 }

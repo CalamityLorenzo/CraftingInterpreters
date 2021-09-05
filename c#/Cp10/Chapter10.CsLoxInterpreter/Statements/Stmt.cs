@@ -9,7 +9,10 @@ namespace CsLoxInterpreter.Expressions
         internal interface IVisitor<T>
         {
             T VisitBlockStmt(Block stmt);
+            T VisitBreakStmt(Break stmt);
             T VisitExpressionStmt(ExpressionStmt stmt);
+            T VisitFunctionStmt(Function stmt);
+            T VisitReturnStmt(Return stmt);
             T VisitIfStmt(If stmt);
             T VisitPrintStmt(Print stmt);
             T VisitWhileStmt(While stmt);
@@ -29,6 +32,18 @@ namespace CsLoxInterpreter.Expressions
             }
             public List<Stmt> Statments { get; }
         }
+        internal class Break : Stmt
+        {
+            internal Break()
+            {
+            }
+
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitBreakStmt(this);
+            }
+        }
+
         internal class ExpressionStmt : Stmt
         {
             internal ExpressionStmt(Expr expression)
@@ -42,6 +57,26 @@ namespace CsLoxInterpreter.Expressions
                 return visitor.VisitExpressionStmt(this);
             }
             public Expr Expression { get; }
+        }
+
+
+        internal class Function : Stmt
+        {
+            internal Function(Token Name, List<Token> @params, List<Stmt> body)
+            {
+                this.Name = Name;
+                this.Params = @params;
+                Body = body;
+            }
+
+
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitFunctionStmt(this);
+            }
+            public Token Name { get; }
+            public List<Token> Params { get; }
+            public List<Stmt> Body { get; }
         }
 
         internal class If : Stmt
@@ -79,6 +114,22 @@ namespace CsLoxInterpreter.Expressions
             public Expr Expression { get; }
         }
 
+        internal class Return : Stmt
+        {
+            internal Return(Token keyword, Expr value)
+            {
+                this.Keyword = keyword;
+                this.Value = value;
+            }
+
+
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitReturnStmt(this);
+            }
+            public Token Keyword { get; }
+            public Expr Value { get; }
+        }
 
         internal class While : Stmt
         {

@@ -35,7 +35,7 @@ namespace CsLoxInterpreter.Errors
         {
         }
 
-        public RuntimeError(Token @operator, string message): base(message)
+        public RuntimeError(Token @operator, string message) : base(message)
         {
             this.Token = @operator;
         }
@@ -44,4 +44,5 @@ namespace CsLoxInterpreter.Errors
         {
         }
     }
+    class BreakException : Exception { }
 }

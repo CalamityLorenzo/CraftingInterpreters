@@ -11,19 +11,31 @@
     },
     "Asignment_file": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\AssignData.cslox",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\AssignData.cslox"
     },
     "Assignment_scope": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp8\\Chapter8.App\\loxScript\\blockSemantics.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\blockSemantics.cslox"
     },
     "Conditions_While": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\whilLoop.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\whilLoop.cslox"
     },
     "Conditions_For": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\Cp9\\Chapter9.App\\loxScript\\forLoop.cslox"
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\forLoop.cslox"
+    },
+    "Functions_hi": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\funtests.cslox"
+    },
+    "Functions_fib": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\funfib.cslox"
+    },
+    "Functions_ctr": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp10\\chapter10.App\\loxScript\\funcounter.cslox"
     }
   }
 }

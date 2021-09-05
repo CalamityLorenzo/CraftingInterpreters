@@ -1,4 +1,5 @@
 ﻿using CsLoxInterpreter.Expressions;
+using System;
 using System.Text;
 
 namespace CsLoxInterpreter.Utilities
@@ -21,6 +22,11 @@ namespace CsLoxInterpreter.Utilities
         public string VisitBinaryExpr(Expr.Binary expr)
         {
             return Printer(expr.Operator.Lexeme, expr.Left, expr.Right);
+        }
+
+        public string VisitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
         }
 
         public string VisitGroupingExpr(Expr.Grouping expr)
