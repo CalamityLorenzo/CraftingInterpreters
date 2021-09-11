@@ -1,0 +1,20 @@
+﻿
+var x=100;
+
+while(x>1){
+print "hello";
+var y=x-1;
+x =y;
+print x;
+}
+
+
+while("Hello Mister kittens"){
+	print "Kittens";
+	var y=x-1;
+	x =y;
+	print x;
+}
+
+
+

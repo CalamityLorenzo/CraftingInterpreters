@@ -1,3 +1,4 @@
+using Chapter11.CsLoxInterpreter;
 using CsLoxInterpreter.Errors;
 using CsLoxInterpreter.Expressions;
 
@@ -57,10 +58,10 @@ namespace CsLoxInterpreter.Details
                 Parser parser = new(Tokens);
                 List<Stmt> stmts = parser.Parse();
                 if (hadError) return;
+
                 Resolver resolver = new Resolver(interpreter);
                 resolver.Resolve(stmts);
                 if (hadError) return;
-
                 interpreter.Interpret(stmts);
                 if (hadError)
                 {

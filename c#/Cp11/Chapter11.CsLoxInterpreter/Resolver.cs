@@ -1,10 +1,10 @@
-﻿using CsLoxInterpreter;
-using CsLoxInterpreter.Expressions;
-using Unit = System.ValueTuple;
-using System.Collections.Generic;
+﻿
 using CsLoxInterpreter.Details;
+using CsLoxInterpreter.Expressions;
+using CsLoxInterpreter.Utilities;
+using Unit = System.ValueTuple;
 
-namespace Chapter11.CsLoxInterpreter.Statements
+namespace CsLoxInterpreter
 {
     internal enum FunctionType
     {
@@ -15,12 +15,12 @@ namespace Chapter11.CsLoxInterpreter.Statements
     {
         private readonly Interpreter interpreter;
 
-        private readonly Stack<Dictionary<string, bool>> Scopes;
+        private readonly List<Dictionary<string, bool>> Scopes;
         private FunctionType CurrentFunction = FunctionType.NONE;
         public Resolver(Interpreter interpreter)
         {
             this.interpreter = interpreter;
-            this.Scopes = new Stack<Dictionary<string, bool>>();
+            this.Scopes = new List<Dictionary<string, bool>>();
         }
         #region interfacae waffle
         public Unit VisitAssignExpr(Expr.Assign expr)
@@ -131,7 +131,8 @@ namespace Chapter11.CsLoxInterpreter.Statements
 
         public Unit VisitVariableExpr(Expr.Variable expr)
         {
-            if (Scopes.Count != 0) {
+            if (Scopes.Count != 0)
+            {
                 var scope = Scopes.Peek();
                 if (scope.ContainsKey(expr.Name.Lexeme) && scope[expr.Name.Lexeme] == false)
                 {
@@ -181,43 +182,14 @@ namespace Chapter11.CsLoxInterpreter.Statements
             statement.Accept(this);
         }
 
-        private void BeginScope()
-        {
-            this.Scopes.Push(new Dictionary<string, bool>());
-        }
-
-        private void EndScope()
-        {
-            this.Scopes.Pop();
-        }
-        private void Declare(Token name)
-        {
-            if (Scopes.Count == 0) return;
-            var scope = Scopes.Peek();
-
-            if (scope.ContainsKey(name.Lexeme))
-            {
-                CSLox.Error(name, "Already a variable with this name in this scope.");
-            }
-            else
-                scope.Add(name.Lexeme, false);
-        }
-
-        private void Define(Token name)
-        {
-            if (Scopes.Count == 0) return;
-            Scopes.Peek()[name.Lexeme] = true;
-
-        }
-
         private void ResolveLocal(Expr expr, Token name)
         {
-            var allScopes = this.Scopes.ToArray();
+            ;
             for (int i = Scopes.Count - 1; i >= 0; i--)
             {
-                if (allScopes[i].ContainsKey(name.Lexeme))
+                if (Scopes[i].ContainsKey(name.Lexeme))
                 {
-                    var val = Scopes.Count() - 1 - i;
+                    var val = Scopes.Count - 1 - i;
                     this.interpreter.Resolve(expr, val);
                     return;
                 }
@@ -238,6 +210,38 @@ namespace Chapter11.CsLoxInterpreter.Statements
             EndScope();
             CurrentFunction = enclosingFunction;
         }
+
+
+        private void BeginScope()
+        {
+            this.Scopes.Add(new Dictionary<string, bool>());
+        }
+
+        private void EndScope()
+        {
+            this.Scopes.RemoveAt(this.Scopes.Count - 1);
+        }
+
+        private void Declare(Token name)
+        {
+            if (Scopes.Count == 0) return;
+            var scope = Scopes.Peek();
+
+            if (scope.ContainsKey(name.Lexeme))
+            {
+                CSLox.Error(name, "Already a variable with this name in this scope.");
+            }
+            else
+                scope.Add(name.Lexeme, false);
+        }
+
+        private void Define(Token name)
+        {
+            if (Scopes.Count == 0) return;
+            Scopes.Peek()[name.Lexeme] = true;
+
+        }
+
 
         #endregion
     }
