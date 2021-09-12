@@ -333,7 +333,6 @@ namespace CsLoxInterpreter
             }
         }
 
-
         private bool isTruthy(object right)
         {
             if (right == null) return false;

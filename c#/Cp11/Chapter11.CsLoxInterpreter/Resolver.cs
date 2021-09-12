@@ -184,7 +184,6 @@ namespace CsLoxInterpreter
 
         private void ResolveLocal(Expr expr, Token name)
         {
-            ;
             for (int i = Scopes.Count - 1; i >= 0; i--)
             {
                 if (Scopes[i].ContainsKey(name.Lexeme))
@@ -210,7 +209,6 @@ namespace CsLoxInterpreter
             EndScope();
             CurrentFunction = enclosingFunction;
         }
-
 
         private void BeginScope()
         {

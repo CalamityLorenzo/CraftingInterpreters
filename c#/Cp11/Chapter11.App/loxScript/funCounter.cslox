@@ -1,5 +1,6 @@
 ﻿fun MakeCounter()
 {
+	var d;
     var i=0;
 	fun Count(){
 		i=i+1;
