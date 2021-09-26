@@ -1,0 +1,14 @@
+﻿var outside = "William";
+fun getWilliam()
+{
+
+	return fun printWilliam(){
+		print outside;
+	}
+
+}
+
+var D = getWilliam();
+D();
+outside = "Ted";
+D();

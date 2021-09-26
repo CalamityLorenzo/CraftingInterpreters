@@ -4,7 +4,7 @@ declaration     -> classDecl
                 | varDecl 
                 | statement;
 classDecl       -> "class" IDENTIFIER "{" function* "}";                    
-funcDecl        -> "fun" function;
+funcDecl        -> "fun" function | "class" function;
 function        -> IDENTIFIER "(" parameters? ")" block;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )*;
 varDecl         -> "var" IDENTIFIER ("=" expression)? ";" ;

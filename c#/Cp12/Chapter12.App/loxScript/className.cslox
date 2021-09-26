@@ -1,0 +1,22 @@
+﻿class Scones
+{
+	serveOn(){
+		return "plates";
+	}
+
+	
+}
+
+print Scones;
+
+var s = Scones();
+s.William = Scones();
+s.William.Fred = 0;
+print Scones();
+
+print s.William;
+print s.William.Fred;
+
+
+print s.serveOn();
+print s.William.serveOn();
