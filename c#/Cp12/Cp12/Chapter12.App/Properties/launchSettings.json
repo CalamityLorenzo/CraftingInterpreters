@@ -1,0 +1,53 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {},
+      "distributionName": ""
+    },
+    "Assignment": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    },
+    "Asignment_file": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\AssignData.cslox"
+    },
+    "Assignment_scope": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\blockSemantics.cslox"
+    },
+    "Conditions_While": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\whilLoop.cslox"
+    },
+    "Conditions_For": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\forLoop.cslox"
+    },
+    "Functions_hi": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\funtests.cslox"
+    },
+    "Functions_fib": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\funfib.cslox"
+    },
+    "Functions_ctr": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\funcounter.cslox"
+    },
+    "Functions_localFunc": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\funcounter.cslox"
+    },
+    "Class_className": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\className.cslox"
+    },
+    "Class_classThis": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp12\\Chapter12.App\\loxScript\\classCake.cslox"
+    }
+  }
+}

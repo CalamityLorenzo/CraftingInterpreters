@@ -1,0 +1,33 @@
+﻿class Cake
+{
+
+	init(a, b){
+	this.a = a;
+	this.b = b;
+	}
+	taste(){
+		var adjective = "delicious";
+		print "The " + this.flavour + " cake is " + adjective + "!";
+	}
+
+	what(){
+		print this;
+	}
+}
+
+
+var cake = Cake("10",2);
+var cake2 = Cake("five", 1);
+
+cake.flavour = "German Choclate";
+cake2.flavour = "Italian cheesecake";
+cake.taste();
+cake.taste = cake2.taste;
+cake.taste();
+
+cake.what(); 
+
+print cake.a;
+print cake.b;
+print cake2.a;
+print cake2.b;

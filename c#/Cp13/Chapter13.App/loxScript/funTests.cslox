@@ -1,0 +1,28 @@
+﻿fun WriteItCount(message, counter)
+{
+	for(var i=0;i<counter;i=i+1)
+	{
+	if(i==3 or i==6 or i==9){
+		print "Fizz";
+		}
+	if(i==5 or i==0)
+		print "Buzz";
+	}
+	fun PrintIt(){
+	print "It";
+	}
+
+	PrintIt();
+}
+
+fun sayHi(first, last){
+	print "Hi, " + first + " " + last + " ";
+}
+
+fun sayYes(){ print "Yes";}
+
+sayHi("Fear", "Reader");
+
+sayYes();
+
+WriteItCount("Say you, Say me", 10);

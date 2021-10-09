@@ -1,0 +1,40 @@
+﻿fun MakeCounter()
+{
+	var d;
+    var i=0;
+	fun Count(){
+		i=i+1;
+		return i;
+	}
+	
+	return Count;
+}
+
+var counter = MakeCounter();
+
+
+var g1 = "pelicean";
+var g2 = g1;
+
+fun makeItHard(){
+
+	fun callG1(){
+		print g2;
+	}
+
+	g1 = "First";
+
+	return callG1;
+
+}
+
+counter();
+print counter();
+counter();
+print counter();print counter();print counter();print counter();print counter();
+
+print counter;
+
+
+var callG1 = makeItHard();
+callG1();
