@@ -3,7 +3,7 @@ declaration     -> classDecl
                 | funcDecl 
                 | varDecl 
                 | statement;
-classDecl       -> "class" IDENTIFIER "{" function* "}";                    
+classDecl       -> "class" IDENTIFIER ("<" IDENTIFIER)?" {" function* "}";                    
 funcDecl        -> "fun" function;
 function        -> IDENTIFIER "(" parameters? ")" block;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )*;
@@ -41,9 +41,10 @@ primary         -> NUMBER
                 | "true" 
                 | "false" 
                 | "nil" 
-                | "(" expression ")"
                 | IDENTIFIER; 
-
+                | "(" expression ")"
+                | "super" "." IDENTIFIER; // super can't exist in vaccuum. It must be associated to an identifier when used.
+                
 Notes
 ======
 Post fix grammer operators

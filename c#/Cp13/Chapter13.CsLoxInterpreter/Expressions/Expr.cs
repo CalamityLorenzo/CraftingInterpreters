@@ -19,6 +19,7 @@ namespace CsLoxInterpreter.Expressions
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
             T VisitSetExpr(Set expr);
+            T VisitSuperExpr(Super expr);
             T VisitThisExpr(This expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
@@ -164,6 +165,23 @@ namespace CsLoxInterpreter.Expressions
             public Token Name { get; }
             public Expr Value { get; }
         }
+        internal class Super : Expr
+        {
+            internal Super(Token keyword, Token method)
+            {
+                this.Keyword = keyword;
+                this.Method = method;
+            }
+
+
+            internal override T Accept<T>(ILoxVisitor<T> visitor)
+            {
+                return visitor.VisitSuperExpr(this);
+            }
+            public Token Keyword { get; }
+            public Token Method { get; }
+        }
+
         public class This : Expr
         {
             internal This(Token keyword)

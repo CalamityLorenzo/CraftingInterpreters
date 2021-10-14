@@ -24,6 +24,7 @@ namespace ExpressIonGenerator
                 "Literal  : Object value",
                 "Logical  : Expr left, Token @operator, Expr right",
                 "Set      : Expr @object, Token name, Expr value",
+                "Super    : Token keyword, Token method",
                 "This     : Token keyword",
                 "Unary    : Token @operator, Expr right",
                 "Variable : Token name"
@@ -33,7 +34,7 @@ namespace ExpressIonGenerator
             {
                 "Block          : List<Stmt> statments",
                 "Break          : ",
-                "Class          : Token name, List<Stmt.Function> methods",
+                "Class          : Token name, Expr.Variable superClass, List<Stmt.Function> methods",
                 "ExpressionStmt : Expr expression",
                 "Function       : Token Name, List<Token> params, List<Stmt> body",
                 "If             : Expr condition, Stmt thenBranch, Stmt elseBranch",

@@ -31,7 +31,7 @@ namespace CsLoxInterpreter
         {
             Object left = Evaluate(expr.Left);
             Object right = Evaluate(expr.Right);
-
+             
             switch (expr.Operator.Type)
             {
                 case MINUS:
@@ -153,7 +153,7 @@ namespace CsLoxInterpreter
         {
             object @object = Evaluate(expr.Object);
 
-            if(!(@object is LoxInstance))
+            if (!(@object is LoxInstance))
             {
                 throw new RuntimeError(expr.Name, "Only instances have fields.");
             }
@@ -162,6 +162,21 @@ namespace CsLoxInterpreter
             ((LoxInstance)@object).Set(expr.Name, value);
             return value;
         }
+
+        public object VisitSuperExpr(Expr.Super expr)
+        {
+            int distance = _Locals[expr];
+            var superClass = (LoxClass)_Environment.GetAt(distance, "super");
+            LoxInstance @object = (LoxInstance)_Environment.GetAt(distance - 1, "this");
+
+            LoxFunction method = superClass.FindMethod(expr.Method.Lexeme);
+            if (method == null)
+            {
+                throw new RuntimeError(expr.Method, $"Undefined property '{expr.Method.Lexeme}'.");
+            }
+            return method.Bind(@object);
+        }
+
 
         internal void Resolve(Expr expr, int depth)
         {
@@ -175,7 +190,8 @@ namespace CsLoxInterpreter
             if (_Locals.ContainsKey(expr))
             {
                 _Environment.AssignAt(_Locals[expr], expr.Name, value);
-            } else
+            }
+            else
                 _Globals.Assign(expr.Name, value);
             return value;
 
@@ -245,16 +261,37 @@ namespace CsLoxInterpreter
 
         public Unit VisitClassStmt(Stmt.Class classStmt)
         {
+            object superclass = null;
+            if (classStmt.SuperClass != null)
+            {
+                superclass = Evaluate(classStmt.SuperClass);
+                if (!(superclass is LoxClass))
+                {
+                    throw new RuntimeError(classStmt.SuperClass.Name, "Superclass must be a class.");
+                }
+            }
+
             this._Environment.Define(classStmt.Name.Lexeme, null);
 
+            if (classStmt.SuperClass != null)
+            {
+                this._Environment = new CSLoxEnvironment(_Environment);
+                _Environment.Define("super", superclass);
+            }
+
             Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
-            foreach(Stmt.Function method in classStmt.Methods)
+            foreach (Stmt.Function method in classStmt.Methods)
             {
                 LoxFunction function = new LoxFunction(method, _Environment, method.Name.Lexeme.Equals("init"));
                 methods[method.Name.Lexeme] = function;
             }
 
-            LoxClass @class = new LoxClass(classStmt.Name.Lexeme, methods);
+            LoxClass @class = new LoxClass(classStmt.Name.Lexeme, (LoxClass)superclass, methods);
+            if (superclass != null)
+            {
+                _Environment = _Environment._Enclosing;
+            }
+
             _Environment.Assign(classStmt.Name, @class);
             return new Unit();
         }
@@ -262,7 +299,7 @@ namespace CsLoxInterpreter
         public object VisitGetExpr(Expr.Get expr)
         {
             Object @object = Evaluate(expr.Object);
-            if(@object is LoxInstance)
+            if (@object is LoxInstance)
             {
                 return ((LoxInstance)@object).Get(expr.Name);
             }

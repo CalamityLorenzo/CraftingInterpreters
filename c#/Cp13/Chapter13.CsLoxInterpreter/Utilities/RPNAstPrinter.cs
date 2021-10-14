@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CsLoxInterpreter.Utilities
 {
-    public class RpnAstPrinter  : Expr.ILoxVisitor<string>
+    internal class RpnAstPrinter  : Expr.ILoxVisitor<string>
     {
         private RpnAstPrinter () { }
         public static string PrintExpression(Expr expr) => new RpnAstPrinter ().Print(expr);
@@ -47,6 +47,11 @@ namespace CsLoxInterpreter.Utilities
         }
 
         public string VisitSetExpr(Expr.Set expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitSuperExpr(Expr.Super expr)
         {
             throw new NotImplementedException();
         }

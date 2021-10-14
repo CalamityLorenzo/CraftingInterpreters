@@ -47,17 +47,18 @@ namespace CsLoxInterpreter.Expressions
         }
         internal class Class : Stmt
         {
-            internal Class(Token name, List<Stmt.Function> methods)
+            internal Class(Token name, Expr.Variable superClass, List<Stmt.Function> methods)
             {
                 this.Name = name;
+                this.SuperClass = superClass;
                 this.Methods = methods;
             }
-
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitClassStmt(this);
             }
             public Token Name { get; }
+            public Expr.Variable SuperClass { get; }
             public List<Stmt.Function> Methods { get; }
         }
 

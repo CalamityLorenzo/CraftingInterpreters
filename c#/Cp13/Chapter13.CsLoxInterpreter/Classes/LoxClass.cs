@@ -11,11 +11,13 @@ namespace CsLoxInterpreter.Classes
     internal class LoxClass : ILoxCallable
     {
         public string Name { get; }
+        public LoxClass SuperClass { get; }
         public Dictionary<string, LoxFunction> Methods { get; }
 
-        public LoxClass(string name, Dictionary<string, LoxFunction> methods)
+        public LoxClass(string name, LoxClass superClass, Dictionary<string, LoxFunction> methods)
         {
             this.Name = name;
+            SuperClass = superClass;
             this.Methods = methods;
         }
 
@@ -41,6 +43,11 @@ namespace CsLoxInterpreter.Classes
         internal LoxFunction FindMethod(string name)
         {
             if (Methods.ContainsKey(name)) return Methods[name];
+            // erm...That's inheritance, like the whole mechanism.
+            if (this.SuperClass != null){
+                return this.SuperClass.FindMethod(name);
+            }
+
             return null;
         }
 

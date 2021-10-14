@@ -46,7 +46,15 @@ namespace CsLoxInterpreter
         private Stmt classDeclaration()
         {
             Token name = Consume(IDENTIFIER, "Expect class name.");
-            Consume(LEFT_BRACE, "Execpt '{' before class body");
+
+            Expr.Variable superclass = null;
+            if (Match(LESS))
+            {
+                Consume(IDENTIFIER, "Expect superclass name");
+                superclass = new Expr.Variable(Previous());
+            }
+
+            Consume(LEFT_BRACE, "Expect '{' before class body");
 
             List<Stmt.Function> methods = new List<Stmt.Function>();
             while (!Check(RIGHT_BRACE) && !IsAtEnd())
@@ -55,8 +63,7 @@ namespace CsLoxInterpreter
             }
 
             Consume(RIGHT_BRACE, "Expect '}' after class body");
-
-            return new Stmt.Class(name, methods);
+            return new Stmt.Class(name, superclass, methods);
 
         }
 
@@ -236,7 +243,7 @@ namespace CsLoxInterpreter
                 }
                 /// We are assigning something to a classinstance get...
                 /// Which is impossoble, so it must be a set.
-                else if (expr is Expr.Get) 
+                else if (expr is Expr.Get)
                 {
                     Expr.Get get = (Expr.Get)expr;
                     return new Expr.Set(get.Object, get.Name, value);
@@ -378,7 +385,16 @@ namespace CsLoxInterpreter
             if (Match(TRUE)) return new Expr.Literal(true);
             if (Match(NIL)) return new Expr.Literal(value: null);
 
+            if (Match(SUPER))
+            {
+                Token keyword = Previous();
+                Consume(DOT, "Expect '.' after 'super'.");
+                Token method = Consume(IDENTIFIER, "Expect superclass method name.");
+                return new Expr.Super(keyword, method);
+            }
+
             if (Match(THIS)) return new Expr.This(Previous());
+
 
             if (Match(IDENTIFIER)) return new Expr.Variable(Previous());
 

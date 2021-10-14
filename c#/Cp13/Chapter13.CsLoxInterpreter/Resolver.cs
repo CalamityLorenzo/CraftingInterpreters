@@ -1,4 +1,4 @@
-﻿
+﻿ 
 using CsLoxInterpreter.Details;
 using CsLoxInterpreter.Expressions;
 using CsLoxInterpreter.Utilities;
@@ -25,7 +25,8 @@ namespace CsLoxInterpreter
         internal enum ClassType
         {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         }
         private ClassType CurrentClass = ClassType.NONE;
 
@@ -79,6 +80,22 @@ namespace CsLoxInterpreter
             Declare(stmt.Name);
             Define(stmt.Name);
 
+            if(stmt.SuperClass!=null && stmt.Name.Lexeme == stmt.SuperClass.Name.Lexeme)
+            {
+                CSLox.Error(stmt.SuperClass.Name, "A class can't inherit from itself.");
+            }
+            /// Resolver doesn't resolve Global variables and that environment. (Where most inheritence will occur.)
+            /// Lox allows delcaraions inside of existing blocks, and as they are variable must be resolved.
+            if (stmt.SuperClass != null)
+            {
+                CurrentClass = ClassType.SUBCLASS;
+                Resolve(stmt.SuperClass);
+            }
+            if (stmt.SuperClass != null)
+            {
+                BeginScope();
+                Scopes.Peek().Add("super", true);
+            }
             BeginScope();
             Scopes.Peek().Add("this", true);
 
@@ -94,13 +111,20 @@ namespace CsLoxInterpreter
             }
 
             EndScope();
+
+            if (stmt.SuperClass != null)
+                EndScope();
             this.CurrentClass = enclosingClass;
             return new Unit();
         }
 
 
+        // FIX THIS !!!
+        // WAIT LURN THIS!
         public Unit VisitCallExpr(Expr.Call expr)
         {
+            Resolve(expr.Callee);
+
             foreach (Expr argument in expr.Arguments)
             {
                 Resolve(argument);
@@ -118,6 +142,20 @@ namespace CsLoxInterpreter
         {
             Resolve(expr.Value);
             Resolve(expr.Object);
+            return new Unit();
+        }
+
+        public Unit VisitSuperExpr(Expr.Super expr)
+        {
+            if(CurrentClass==ClassType.NONE)
+            {
+                CSLox.Error(expr.Keyword, "Can't use 'super' outside of a class.");
+            }else if(CurrentClass!= ClassType.SUBCLASS)
+            {
+                CSLox.Error(expr.Keyword, "Can't use 'super' in a class with no superclass");
+            }
+
+            ResolveLocal(expr, expr.Keyword);
             return new Unit();
         }
         public Unit VisitExpressionStmt(Stmt.ExpressionStmt stmt)

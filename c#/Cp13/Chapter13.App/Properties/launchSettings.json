@@ -48,6 +48,10 @@
     "Class_classThis": {
       "commandName": "Project",
       "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp13\\Chapter13.App\\loxScript\\classCake.cslox"
+    },
+    "Class_inheritance": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\OtherCode\\CraftingInterpreters\\c#\\cp13\\Chapter13.App\\loxScript\\classInherit.cslox"
     }
   }
 }

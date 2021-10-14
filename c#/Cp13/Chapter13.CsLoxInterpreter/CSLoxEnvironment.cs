@@ -8,7 +8,7 @@ namespace CsLoxInterpreter
     class CSLoxEnvironment
     {
         private readonly Dictionary<string, object> _Values = new();
-        private readonly CSLoxEnvironment _Enclosing;
+        internal readonly CSLoxEnvironment _Enclosing;
 
         public CSLoxEnvironment()
         {

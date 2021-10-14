@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CsLoxInterpreter.Utilities
 {
-    public class AstPrinter : Expr.ILoxVisitor<string>
+    internal class AstPrinter : Expr.ILoxVisitor<string>
     {
         private AstPrinter() { }
         public static string PrintExpression(Expr expr) => new AstPrinter().Print(expr);
@@ -78,6 +78,11 @@ namespace CsLoxInterpreter.Utilities
         }
 
         public string VisitThisExpr(Expr.This expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitSuperExpr(Expr.Super expr)
         {
             throw new NotImplementedException();
         }
